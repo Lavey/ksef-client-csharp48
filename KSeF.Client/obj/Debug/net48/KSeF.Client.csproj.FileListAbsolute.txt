@@ -1,0 +1,9 @@
+/home/runner/work/ksef-client-csharp48/ksef-client-csharp48/KSeF.Client/obj/Debug/net48/KSeF.Client.csproj.AssemblyReference.cache
+/home/runner/work/ksef-client-csharp48/ksef-client-csharp48/KSeF.Client/obj/Debug/net48/KSeF.Client.Resources.Strings.en.resources
+/home/runner/work/ksef-client-csharp48/ksef-client-csharp48/KSeF.Client/obj/Debug/net48/KSeF.Client.Resources.Strings.pl.resources
+/home/runner/work/ksef-client-csharp48/ksef-client-csharp48/KSeF.Client/obj/Debug/net48/KSeF.Client.csproj.GenerateResource.cache
+/home/runner/work/ksef-client-csharp48/ksef-client-csharp48/KSeF.Client/obj/Debug/net48/KSeF.Client.GeneratedMSBuildEditorConfig.editorconfig
+/home/runner/work/ksef-client-csharp48/ksef-client-csharp48/KSeF.Client/obj/Debug/net48/KSeF.Client.AssemblyInfoInputs.cache
+/home/runner/work/ksef-client-csharp48/ksef-client-csharp48/KSeF.Client/obj/Debug/net48/KSeF.Client.AssemblyInfo.cs
+/home/runner/work/ksef-client-csharp48/ksef-client-csharp48/KSeF.Client/obj/Debug/net48/KSeF.Client.csproj.CoreCompileInputs.cache
+/home/runner/work/ksef-client-csharp48/ksef-client-csharp48/KSeF.Client/obj/Debug/net48/KSeF.Client.sourcelink.json
