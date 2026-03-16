@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
 using System;
+using System.Threading;
 namespace KSeF.Client.Compatibility
 {
 /// <summary>

@@ -58,7 +58,7 @@ namespace KSeF.Client.Api.Builders.Online
         , IOpenOnlineSessionRequestBuilderWithEncryption
     {
         private FormCode _formCode;
-        private readonly EncryptionInfo _encryption = new();
+        private readonly EncryptionInfo _encryption = new private readonly EncryptionInfo();
 
         private OpenOnlineSessionRequestBuilderImpl() { }
 

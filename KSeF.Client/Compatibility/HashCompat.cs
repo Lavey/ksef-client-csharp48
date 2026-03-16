@@ -15,8 +15,10 @@ internal static class HashCompat
     /// <returns>Obliczony skrót SHA-256.</returns>
     public static byte[] SHA256HashData(byte[] source)
     {
-        using SHA256 sha256 = System.Security.Cryptography.SHA256.Create();
+        using (SHA256 sha256 = System.Security.Cryptography.SHA256.Create())
+        {
         return sha256.ComputeHash(source);
+        }
     }
 
     /// <summary>
@@ -26,8 +28,10 @@ internal static class HashCompat
     /// <returns>Obliczony skrót SHA-256.</returns>
     public static byte[] SHA256HashData(ReadOnlySpan<byte> source)
     {
-        using SHA256 sha256 = System.Security.Cryptography.SHA256.Create();
+        using (SHA256 sha256 = System.Security.Cryptography.SHA256.Create())
+        {
         return sha256.ComputeHash(source.ToArray());
+        }
     }
 }
 

@@ -107,7 +107,7 @@ internal sealed class SelfSignedCertificateForSignatureBuilderImpl
     , ISelfSignedCertificateForSignatureBuilderReady
     , ISelfSignedCertificateForSignatureBuilderWithEncryption
 {
-    private readonly List<string> _subjectParts = [];
+    private readonly List<string> _subjectParts = new System.Collections.Generic.List<object>();
     private EncryptionMethodEnum _encryptionType = EncryptionMethodEnum.Rsa;
 
     /// <summary>
@@ -200,9 +200,11 @@ internal sealed class SelfSignedCertificateForSignatureBuilderImpl
         }
         else
         {
-            using RSA rsa = RSA.Create(2048);
+            using (RSA rsa = RSA.Create(2048))
+            {
             request = new CertificateRequest(subjectName, rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
             return request.CreateSelfSigned(DateTimeOffset.UtcNow.AddMinutes(-61), DateTimeOffset.UtcNow.AddYears(2));
+            }
         }
 #endif
     }

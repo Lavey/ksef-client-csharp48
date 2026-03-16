@@ -127,7 +127,7 @@ public class CryptographyService : ICryptographyService, IDisposable
         byte[] iv = GenerateRandom16BytesIv();
 
         byte[] encryptedKey = EncryptWithRSAUsingPublicKey(key, RSAEncryptionPadding.OaepSHA256);
-        EncryptionInfo encryptionInfo = new()
+        EncryptionInfo encryptionInfo = new EncryptionInfo()
         {
             EncryptedSymmetricKey = Convert.ToBase64String(encryptedKey),
 
@@ -144,23 +144,26 @@ public class CryptographyService : ICryptographyService, IDisposable
     /// <inheritdoc />
     public byte[] EncryptBytesWithAES256(byte[] content, byte[] key, byte[] iv)
     {
-        using Aes aes = CreateConfiguredAes(key, iv);
+        using (Aes aes = CreateConfiguredAes(key, iv))
+        {
         using ICryptoTransform encryptor = aes.CreateEncryptor();
-        using Stream input = BinaryData.FromBytes(content).ToStream();
-        using MemoryStream output = new();
+        using Stream input = byte[].FromBytes(content).ToStream();
+        using MemoryStream output = new using MemoryStream();
         using CryptoStream cryptoWriter = new(output, encryptor, CryptoStreamMode.Write);
 
         input.CopyTo(cryptoWriter);
         cryptoWriter.FlushFinalBlock();
         output.Position = 0;
 
-        return BinaryData.FromStream(output).ToArray();
+        return byte[].FromStream(output).ToArray();
+        }
     }
 
     /// <inheritdoc />
     public void EncryptStreamWithAES256(Stream input, Stream output, byte[] key, byte[] iv)
     {
-        using Aes aes = CreateConfiguredAes(key, iv);
+        using (Aes aes = CreateConfiguredAes(key, iv))
+        {
         using ICryptoTransform encryptor = aes.CreateEncryptor();
 #if NETSTANDARD2_0
         // CryptoStream(stream, transform, mode, leaveOpen) niedostępny na netstandard2.0.
@@ -179,12 +182,14 @@ public class CryptographyService : ICryptographyService, IDisposable
         {
             output.Position = 0;
         }
+        }
     }
 
     /// <inheritdoc />
     public async Task EncryptStreamWithAES256Async(Stream input, Stream output, byte[] key, byte[] iv, CancellationToken cancellationToken = default)
     {
-        using Aes aes = CreateConfiguredAes(key, iv);
+        using (Aes aes = CreateConfiguredAes(key, iv))
+        {
         using ICryptoTransform encryptor = aes.CreateEncryptor();
 #if NETSTANDARD2_0
         CryptoStream cryptoStream = new(output, encryptor, CryptoStreamMode.Write);
@@ -201,27 +206,31 @@ public class CryptographyService : ICryptographyService, IDisposable
         {
             output.Position = 0;
         }
+        }
     }
 
     /// <inheritdoc />
     public byte[] DecryptBytesWithAES256(byte[] content, byte[] key, byte[] iv)
     {
-        using Aes aes = CreateConfiguredAes(key, iv);
+        using (Aes aes = CreateConfiguredAes(key, iv))
+        {
         using ICryptoTransform decryptor = aes.CreateDecryptor();
-        using Stream input = BinaryData.FromBytes(content).ToStream();
-        using MemoryStream output = new();
+        using Stream input = byte[].FromBytes(content).ToStream();
+        using MemoryStream output = new using MemoryStream();
         using CryptoStream cryptoReader = new(input, decryptor, CryptoStreamMode.Read);
 
         cryptoReader.CopyTo(output);
         output.Position = 0;
 
-        return BinaryData.FromStream(output).ToArray();
+        return byte[].FromStream(output).ToArray();
+        }
     }
 
     /// <inheritdoc />
     public void DecryptStreamWithAES256(Stream input, Stream output, byte[] key, byte[] iv)
     {
-        using Aes aes = CreateConfiguredAes(key, iv);
+        using (Aes aes = CreateConfiguredAes(key, iv))
+        {
         using ICryptoTransform decryptor = aes.CreateDecryptor();
         using CryptoStream cryptoStream = new(input, decryptor, CryptoStreamMode.Read);
 
@@ -231,12 +240,14 @@ public class CryptographyService : ICryptographyService, IDisposable
         {
             output.Position = 0;
         }
+        }
     }
 
     /// <inheritdoc />
     public async Task DecryptStreamWithAES256Async(Stream input, Stream output, byte[] key, byte[] iv, CancellationToken cancellationToken = default)
     {
-        using Aes aes = CreateConfiguredAes(key, iv);
+        using (Aes aes = CreateConfiguredAes(key, iv))
+        {
         using ICryptoTransform decryptor = aes.CreateDecryptor();
         using CryptoStream cryptoStream = new(input, decryptor, CryptoStreamMode.Read);
 
@@ -245,6 +256,7 @@ public class CryptographyService : ICryptographyService, IDisposable
         if (output.CanSeek)
         {
             output.Position = 0;
+        }
         }
     }
 
@@ -258,7 +270,8 @@ public class CryptographyService : ICryptographyService, IDisposable
 
 #if NETSTANDARD2_0
         // RSACng obsługuje zarówno podpis PSS, jak i PKCS1, i gwarantuje rozmiar klucza 2048 bitów.
-        using RSA rsa = new RSACng(2048);
+        using (RSA rsa = new RSACng(2048))
+        {
 #else
         using RSA rsa = RSA.Create(2048);
 #endif
@@ -273,6 +286,7 @@ public class CryptographyService : ICryptographyService, IDisposable
         byte[] csrDer = request.CreateSigningRequest();
 #endif
         return (Convert.ToBase64String(csrDer), Convert.ToBase64String(privateKey));
+        }
     }
 
     /// <inheritdoc />
@@ -315,7 +329,8 @@ public class CryptographyService : ICryptographyService, IDisposable
             fileSize = 0;
         }
 
-        using SHA256 sha256 = SHA256.Create();
+        using (SHA256 sha256 = SHA256.Create())
+        {
         byte[] buffer = new byte[81920];
         int read;
         while ((read = fileStream.Read(buffer, 0, buffer.Length)) > 0)
@@ -340,6 +355,7 @@ public class CryptographyService : ICryptographyService, IDisposable
             FileSize = fileSize,
             HashSHA = base64Hash
         };
+        }
     }
 
     /// <inheritdoc />
@@ -363,7 +379,8 @@ public class CryptographyService : ICryptographyService, IDisposable
             fileSize = 0;
         }
 
-        using IncrementalHash hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        using (IncrementalHash hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256))
+        {
         byte[] buffer = new byte[81920];
         int read;
 #if NETSTANDARD2_0
@@ -391,6 +408,7 @@ public class CryptographyService : ICryptographyService, IDisposable
             FileSize = fileSize,
             HashSHA = base64Hash
         };
+        }
     }
 
     /// <inheritdoc />
@@ -398,12 +416,14 @@ public class CryptographyService : ICryptographyService, IDisposable
     {
         string publicKey = GetRSAPublicPem(SymmetricKeyEncryptionPem);
 #if NETSTANDARD2_0
-        using RSA rsa = Compatibility.RsaCompat.CreateFromPemWithOaepSupport(publicKey);
+        using (RSA rsa = Compatibility.RsaCompat.CreateFromPemWithOaepSupport(publicKey))
+        {
 #else
         using RSA rsa = RSA.Create();
         rsa.ImportFromPem(publicKey);
 #endif
         return rsa.Encrypt(content, padding);
+        }
     }
 
     /// <inheritdoc />
@@ -411,12 +431,14 @@ public class CryptographyService : ICryptographyService, IDisposable
     {
         string publicKey = GetRSAPublicPem(KsefTokenPem);
 #if NETSTANDARD2_0
-        using RSA rsa = Compatibility.RsaCompat.CreateFromPemWithOaepSupport(publicKey);
+        using (RSA rsa = Compatibility.RsaCompat.CreateFromPemWithOaepSupport(publicKey))
+        {
 #else
         using RSA rsa = RSA.Create();
         rsa.ImportFromPem(publicKey);
 #endif
         return rsa.Encrypt(content, RSAEncryptionPadding.OaepSHA256);
+        }
     }
 
     /// <inheritdoc />
@@ -447,7 +469,8 @@ public class CryptographyService : ICryptographyService, IDisposable
         Buffer.BlockCopy(cipherText, 0, result, offset, cipherText.Length);
         return result;
 #else
-        using ECDiffieHellman ecdhReceiver = ECDiffieHellman.Create(ECCurve.NamedCurves.nistP256);
+        using (ECDiffieHellman ecdhReceiver = ECDiffieHellman.Create(ECCurve.NamedCurves.nistP256))
+        {
         string publicKey = GetECDSAPublicPem(KsefTokenPem);
         ecdhReceiver.ImportFromPem(publicKey);
 
@@ -465,6 +488,7 @@ public class CryptographyService : ICryptographyService, IDisposable
         return [.. subjectPublicKeyInfo
 , .. nonce, .. tag, .. cipherText];
 #endif
+        }
     }
     /// <summary>
     /// Zapewnia funkcjonalność do asynchronicznego pobierania kolekcji informacji o certyfikatach PEM.
@@ -696,7 +720,8 @@ public class CryptographyService : ICryptographyService, IDisposable
     /// <inheritdoc />
     public (string, string) GenerateCsrWithEcdsa(CertificateEnrollmentsInfoResponse certificateInfo)
     {
-        using ECDsa ecdsa = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        using (ECDsa ecdsa = ECDsa.Create(ECCurve.NamedCurves.nistP256))
+        {
         byte[] privateKey = ecdsa.ExportECPrivateKey();
 
         X500DistinguishedName subject = CreateSubjectDistinguishedName(certificateInfo);
@@ -708,6 +733,7 @@ public class CryptographyService : ICryptographyService, IDisposable
         byte[] csrDer = request.CreateSigningRequest();
 #endif
         return (Convert.ToBase64String(csrDer), Convert.ToBase64String(privateKey));
+        }
     }
 
     private static X500DistinguishedName CreateSubjectDistinguishedName(CertificateEnrollmentsInfoResponse certificateInfo)

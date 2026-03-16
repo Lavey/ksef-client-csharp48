@@ -130,11 +130,11 @@ namespace KSeF.Client.Api.Builders.Batch
         , IOpenBatchSessionRequestBuilderBuild
     {
         private FormCode _formCode;
-        private readonly List<BatchFilePartInfo> _parts = new();
+        private readonly List<BatchFilePartInfo> _parts = new private readonly List<BatchFilePartInfo>();
         private long _batchFileSize;
         private string _batchFileHash = "";
         private bool _offlineMode;
-        private readonly EncryptionInfo _encryption = new();
+        private readonly EncryptionInfo _encryption = new private readonly EncryptionInfo();
 
         /// <summary>
         /// Tworzy nową instancję buildera.

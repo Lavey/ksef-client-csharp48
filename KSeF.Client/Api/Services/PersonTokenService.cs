@@ -12,7 +12,7 @@ namespace KSeF.Client.Api.Services
 /// <inheritdoc/>
 public class PersonTokenService : IPersonTokenService
 {
-    private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    private static readonly JsonSerializerOptions _jsonSerializerOptions = new private static readonly JsonSerializerOptions()
     {
         PropertyNameCaseInsensitive = true
     };
@@ -20,10 +20,10 @@ public class PersonTokenService : IPersonTokenService
     /// <inheritdoc/>
     public PersonToken MapFromJwt(string jwt)
     {
-        JwtSecurityTokenHandler handler = new();
+        JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
         JwtSecurityToken jwtToken = handler.ReadJwtToken(jwt);
 
-        IEnumerable<Claim> claims = [.. jwtToken.Claims];
+        IEnumerable<Claim> claims = new[] { .. jwtToken.Claims };
 
         string Get(string type) =>
             claims.FirstOrDefault(c => c.Type.Equals(type, StringComparison.OrdinalIgnoreCase))?.Value;
@@ -49,17 +49,16 @@ public class PersonTokenService : IPersonTokenService
         string[] rol = ParseJsonStringArray(Get("rol"));
         string[] pep = ParseJsonStringArray(Get("pep"));
 
-        string[] roleTypes =
-        [
+        string[] roleTypes = new[] { 
             ClaimTypes.Role, "role", "roles", "permissions",
             "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
-        ];
+         };
         string[] classicRoles = GetMany(roleTypes);
 
-        string[] unifiedRoles = [.. classicRoles
+        string[] unifiedRoles = new[] { .. classicRoles
             .Concat(per)
             .Concat(rol)
-            .Distinct(StringComparer.OrdinalIgnoreCase)];
+            .Distinct(StringComparer.OrdinalIgnoreCase) };
 
         return new PersonToken
         {
@@ -112,7 +111,8 @@ public class PersonTokenService : IPersonTokenService
         try
         {
             string s = UnwrapIfQuotedJson(maybeJsonArray);
-            using JsonDocument doc = JsonDocument.Parse(s);
+            using (JsonDocument doc = JsonDocument.Parse(s))
+            {
             if (doc.RootElement.ValueKind == JsonValueKind.Array)
             {
                 return [.. doc.RootElement
@@ -121,6 +121,7 @@ public class PersonTokenService : IPersonTokenService
                           .Select(e => e.GetString()!)
                           .Where(v => !string.IsNullOrWhiteSpace(v))
                           .Distinct(StringComparer.OrdinalIgnoreCase)];
+            }
             }
         }
         catch { /* ignore */ }
@@ -138,7 +139,7 @@ public class PersonTokenService : IPersonTokenService
 
     private static string UnwrapIfQuotedJson(string s)
     {
-        if (s.Length > 1 && s[0] == '"' && s[^1] == '"')
+        if (s.Length > 1 && s[0] == '"' && s[s.Length - 1] == '"')
         {
             try
             {

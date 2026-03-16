@@ -2,6 +2,7 @@ using KSeF.Client.Core.Models.Authorization;
 using KSeF.Client.Validation;
 
 using System;
+using System.Linq;
 namespace KSeF.Client.Api.Builders.Auth
 {
 /// <summary>
@@ -151,7 +152,7 @@ internal sealed class AuthKsefTokenRequestBuilderImpl :
     /// <inheritdoc />
     public IAuthKsefTokenRequestBuilderWithContext WithContext(AuthenticationTokenContextIdentifierType type, string value)
     {
-        AuthenticationTokenContextIdentifier context = new() { Type = type, Value = value };
+        AuthenticationTokenContextIdentifier context = new AuthenticationTokenContextIdentifier() { Type = type, Value = value };
         return WithContext(context);
     }
 

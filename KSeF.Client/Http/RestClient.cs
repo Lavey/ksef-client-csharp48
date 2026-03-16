@@ -95,7 +95,8 @@ public sealed class RestClient : IRestClient
             throw new ArgumentException("Adres URL nie może być pusty.", nameof(url));
         }
 
-        using HttpRequestMessage httpRequestMessage = new(method, url);
+        using (HttpRequestMessage httpRequestMessage = new(method, url))
+        {
 
         bool shouldSendBody = method != HttpMethod.Get &&
                               !EqualityComparer<TRequest>.Default.Equals(requestBody, default);
@@ -126,6 +127,7 @@ public sealed class RestClient : IRestClient
         }
 
         return await SendCoreWithHeadersAsync<TResponse>(httpRequestMessage, cancellationToken).ConfigureAwait(false);
+        }
     }
 
     /// <inheritdoc />
@@ -187,7 +189,8 @@ public sealed class RestClient : IRestClient
             throw new ArgumentException("Adres URL nie może być pusty.", nameof(url));
         }
 
-        using HttpRequestMessage httpRequestMessage = new(method, url);
+        using (HttpRequestMessage httpRequestMessage = new(method, url))
+        {
 
         if (!string.IsNullOrWhiteSpace(token))
         {
@@ -195,6 +198,7 @@ public sealed class RestClient : IRestClient
         }
 
         await SendCoreAsync<string>(httpRequestMessage, cancellationToken).ConfigureAwait(false);
+        }
     }
 
     // ================== RestRequest overloads ==================
@@ -203,10 +207,12 @@ public sealed class RestClient : IRestClient
     {
         Guard.ThrowIfNull(request);
 
-        using HttpRequestMessage httpRequestMessage = request.ToHttpRequestMessage(httpClient);
+        using (HttpRequestMessage httpRequestMessage = request.ToHttpRequestMessage(httpClient))
+        {
         using CancellationTokenSource cancellationTokenSource = CreateTimeoutCancellationTokenSource(request.Timeout, cancellationToken);
 
         return await SendCoreAsync<TResponse>(httpRequestMessage, cancellationTokenSource.Token).ConfigureAwait(false);
+        }
     }
 
     /// <inheritdoc />
@@ -230,10 +236,12 @@ public sealed class RestClient : IRestClient
     {
         Guard.ThrowIfNull(request);
 
-        using HttpRequestMessage httpRequestMessage = request.ToHttpRequestMessage(httpClient, DefaultContentType);
+        using (HttpRequestMessage httpRequestMessage = request.ToHttpRequestMessage(httpClient, DefaultContentType))
+        {
         using CancellationTokenSource cancellationTokenSource = CreateTimeoutCancellationTokenSource(request.Timeout, cancellationToken);
 
         return await SendCoreAsync<TResponse>(httpRequestMessage, cancellationTokenSource.Token).ConfigureAwait(false);
+        }
     }
 
     /// <inheritdoc />
@@ -271,11 +279,13 @@ public sealed class RestClient : IRestClient
             }
 
 #if NETSTANDARD2_0
-            using Stream responseStream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            using (Stream responseStream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false))
+            {
 #else
-            using Stream responseStream = await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            using Stream responseStream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
 #endif
             return await JsonUtil.DeserializeAsync<T>(responseStream).ConfigureAwait(false);
+            }
         }
 
         await HandleInvalidStatusCode(httpResponseMessage, cancellationToken).ConfigureAwait(false);
@@ -327,12 +337,14 @@ public sealed class RestClient : IRestClient
             }
 
 #if NETSTANDARD2_0
-            using Stream responseStream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            using (Stream responseStream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false))
+            {
 #else
-            using Stream responseStream = await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            using Stream responseStream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
 #endif
             T body = await JsonUtil.DeserializeAsync<T>(responseStream).ConfigureAwait(false);
             return new RestResponse<T>(body, headers);
+            }
         }
 
         await HandleInvalidStatusCode(httpResponseMessage, cancellationToken).ConfigureAwait(false);
@@ -371,7 +383,7 @@ public sealed class RestClient : IRestClient
                 return;
         }
 
-        static bool TryExtractRetryAfterHeaderValue(HttpResponseMessage responseMessage, out string retryAfterHeaderValue)
+        bool TryExtractRetryAfterHeaderValue(HttpResponseMessage responseMessage, out string retryAfterHeaderValue)
         {
             retryAfterHeaderValue = null;
 
@@ -397,13 +409,13 @@ public sealed class RestClient : IRestClient
             return false;
         }
 
-        static bool IsJsonContent(HttpResponseMessage responseMessage)
+        bool IsJsonContent(HttpResponseMessage responseMessage)
         {
             MediaTypeHeaderValue contentTypeHeader = responseMessage.Content?.Headers?.ContentType;
             return IsJsonMediaType(contentTypeHeader?.MediaType);
         }
 
-        static string BuildErrorMessageFromDetails(ApiErrorResponse apiErrorResponse)
+        string BuildErrorMessageFromDetails(ApiErrorResponse apiErrorResponse)
         {
             if (apiErrorResponse?.Exception.ExceptionDetailList is not { Count: > 0 })
             {
@@ -421,7 +433,7 @@ public sealed class RestClient : IRestClient
             return string.Join(" | ", parts);
         }
 
-        static ApiErrorResponse MapProblemDetailsToApiErrorResponse(
+        ApiErrorResponse MapProblemDetailsToApiErrorResponse(
             string title,
             int status,
             string detail,
@@ -432,7 +444,7 @@ public sealed class RestClient : IRestClient
         {
             List<string> details = new List<string>();
 
-            static void AddIfNotEmpty(List<string> list, string value, string prefix = "")
+            void AddIfNotEmpty(List<string> list, string value, string prefix = "")
             {
                 if (!string.IsNullOrWhiteSpace(value))
                     list.Add(prefix + value);
@@ -491,7 +503,7 @@ public sealed class RestClient : IRestClient
             }
         }
 
-        static async Task HandleTooManyRequestsAsync(HttpResponseMessage responseMessage, CancellationToken innerCancellationToken)
+        async Task HandleTooManyRequestsAsync(HttpResponseMessage responseMessage, CancellationToken innerCancellationToken)
         {
             string rateLimitMessage = RateLimitText;
 
@@ -514,7 +526,7 @@ public sealed class RestClient : IRestClient
             throw KsefRateLimitException.FromRetryAfterHeader(rateLimitMessage, retryAfterHeaderValue);
         }
 
-        static async Task HandleOtherErrorsAsync(HttpResponseMessage responseMessage, CancellationToken innerCancellationToken)
+        async Task HandleOtherErrorsAsync(HttpResponseMessage responseMessage, CancellationToken innerCancellationToken)
         {
             string responseBody = await ReadContentAsync(responseMessage, innerCancellationToken).ConfigureAwait(false);
 
@@ -552,7 +564,7 @@ public sealed class RestClient : IRestClient
             }
         }
 
-        static async Task HandleUnauthorizedAsync(HttpResponseMessage responseMessage, CancellationToken innerCancellationToken)
+        async Task HandleUnauthorizedAsync(HttpResponseMessage responseMessage, CancellationToken innerCancellationToken)
         {
             string responseBody = await ReadContentAsync(responseMessage, innerCancellationToken).ConfigureAwait(false);
 
@@ -597,7 +609,7 @@ public sealed class RestClient : IRestClient
             throw new KsefApiException($"HTTP {(int)responseMessage.StatusCode}: {responseMessage.ReasonPhrase ?? UnauthorizedText}", responseMessage.StatusCode);
         }
 
-        static async Task HandleForbiddenAsync(HttpResponseMessage responseMessage, CancellationToken innerCancellationToken)
+        async Task HandleForbiddenAsync(HttpResponseMessage responseMessage, CancellationToken innerCancellationToken)
         {
             string responseBody = await ReadContentAsync(responseMessage, innerCancellationToken).ConfigureAwait(false);
 
@@ -683,7 +695,7 @@ public sealed class RestClient : IRestClient
     private static bool IsJsonMediaType(string mediaType)
     {
         return !string.IsNullOrEmpty(mediaType) &&
-               mediaType.Contains("json", StringComparison.OrdinalIgnoreCase);
+               mediaType.IndexOf("json", System.StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
     private static CancellationTokenSource CreateTimeoutCancellationTokenSource(TimeSpan? perRequestTimeout, CancellationToken cancellationToken)

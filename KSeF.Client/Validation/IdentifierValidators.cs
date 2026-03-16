@@ -77,7 +77,7 @@ public static class IdentifierValidators
         }
 
         int checksum = sum % 10;
-        int controlDigit = digits[^1] - '0';
+        int controlDigit = digits[digits.Length - 1] - '0';
 
         return checksum == controlDigit;
     }

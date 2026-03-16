@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 
 using System.Text;
 using System;
+using System.Threading;
 namespace KSeF.Client.Compatibility
 {
 /// <summary>

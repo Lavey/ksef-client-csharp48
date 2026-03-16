@@ -116,15 +116,19 @@ namespace KSeF.Client.Api.Services
                 {
                     if (cert.GetRSAPublicKey() != null)
                     {
-                        using RSA rsaTemp = RSA.Create();
+                        using (RSA rsaTemp = RSA.Create())
+                        {
                         rsaTemp.ImportRSAPrivateKey(privateKeyBytes, out _);
                         cert = cert.CopyWithPrivateKey(rsaTemp);
+                        }
                     }
                     else if (cert.GetECDsaPublicKey() != null)
                     {
-                        using ECDsa ecdsaTemp = ECDsa.Create();
+                        using (ECDsa ecdsaTemp = ECDsa.Create())
+                        {
                         ecdsaTemp.ImportPkcs8PrivateKey(privateKeyBytes, out _);
                         cert = cert.CopyWithPrivateKey(ecdsaTemp);
+                        }
                     }
                     else
                     {

@@ -29,7 +29,7 @@ public static class BatchPartsSender
             throw new InvalidOperationException("Brak informacji o częściach paczki do wysłania.");
         }
 
-        List<string> errors = new();
+        List<string> errors = new List<string>();
 
         foreach (PackagePartSignatureInitResponseType part in parts)
         {
@@ -42,7 +42,8 @@ public static class BatchPartsSender
                 continue;
             }
 
-            using HttpContent content = contentFactory(fileInfo);
+            using (HttpContent content = contentFactory(fileInfo))
+            {
 
             if (string.IsNullOrWhiteSpace(part.Method))
             {
@@ -63,6 +64,7 @@ public static class BatchPartsSender
             catch (Exception ex)
             {
                 errors.Add($"Błąd wysyłki części paczki {part.OrdinalNumber}: {ex.Message}");
+            }
             }
         }
 

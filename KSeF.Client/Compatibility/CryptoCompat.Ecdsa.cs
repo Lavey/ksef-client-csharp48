@@ -330,7 +330,8 @@ internal static class EcdsaCompat
         else
         {
             // Wyprowadź klucz publiczny z prywatnego przez import i reeksport
-            using ECDsa temp = ECDsa.Create(curve);
+            using (ECDsa temp = ECDsa.Create(curve))
+            {
             // Importuj klucz prywatny z fikcyjnym Q, potem eksportuj aby uzyskać prawdziwy Q
             int coordSize = GetCoordSize(curve);
             parameters.Q = new ECPoint
@@ -350,6 +351,7 @@ internal static class EcdsaCompat
                 // Awaryjnie: nie udało się odtworzyć klucza publicznego
                 throw new CryptographicException(
                     "Nie udało się odtworzyć klucza publicznego EC z klucza prywatnego.");
+            }
             }
         }
 

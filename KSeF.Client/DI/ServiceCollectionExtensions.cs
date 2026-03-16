@@ -33,7 +33,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddKSeFClient(this IServiceCollection services,
         Action<KSeFClientOptions> configure)
     {
-        KSeFClientOptions options = new();
+        KSeFClientOptions options = new KSeFClientOptions();
         configure(options);
         if (string.IsNullOrEmpty(options.BaseUrl))
         {
@@ -68,7 +68,7 @@ public static class ServiceCollectionExtensions
             })
             .ConfigurePrimaryHttpMessageHandler(() =>
             {
-                HttpClientHandler handler = new();
+                HttpClientHandler handler = new HttpClientHandler();
                 if (options.WebProxy != null)
                 {
                     handler.Proxy = options.WebProxy;
@@ -131,7 +131,7 @@ public static class ServiceCollectionExtensions
         Guard.ThrowIfNull(services);
         Guard.ThrowIfNull(configure);
 
-        LighthouseClientOptions options = new();
+        LighthouseClientOptions options = new LighthouseClientOptions();
         configure(options);
 
         if (string.IsNullOrWhiteSpace(options.BaseUrl))

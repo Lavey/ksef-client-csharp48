@@ -45,7 +45,8 @@ internal static class SelfSignedCertificateCompat
             KeyUsage = CngKeyUsages.AllUsages,
         };
         keyParams.Parameters.Add(new CngProperty("Length", BitConverter.GetBytes(2048), CngPropertyOptions.None));
-        using CngKey cngKey = CngKey.Create(CngAlgorithm.Rsa, null, keyParams);
+        using (CngKey cngKey = CngKey.Create(CngAlgorithm.Rsa, null, keyParams))
+        {
         using RSACng rsa = new RSACng(cngKey);
 
         byte[] tbsCert = BuildTbsCertificate(subjectDN, rsa, notBefore, notAfter, isEcdsa: false);
@@ -59,6 +60,7 @@ internal static class SelfSignedCertificateCompat
         // Buduj PFX ręcznie z ASN.1 (certDer + pkcs8Key) i reimportuj z Exportable.
         byte[] pfxBytes = BuildPfx(certDer, pkcs8Key);
         return new X509Certificate2(pfxBytes, string.Empty, X509KeyStorageFlags.Exportable);
+        }
     }
 
     /// <summary>
@@ -74,7 +76,8 @@ internal static class SelfSignedCertificateCompat
         DateTimeOffset notAfter)
     {
         PlatformGuard.EnsureWindowsCng();
-        using ECDsa ecdsa = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        using (ECDsa ecdsa = ECDsa.Create(ECCurve.NamedCurves.nistP256))
+        {
         byte[] tbsCert = BuildTbsCertificate(subjectDN, ecdsa, notBefore, notAfter, isEcdsa: true);
         // ECDsa.SignData na .NET Framework zwraca format IEEE P1363 (r||s).
         // Certyfikaty X.509 wymagają podpisu ECDSA zakodowanego w DER.
@@ -85,6 +88,7 @@ internal static class SelfSignedCertificateCompat
         byte[] pkcs8Key = ExportEcPrivateKeyPkcs8(ecdsa.ExportParameters(true));
         byte[] pfxBytes = BuildPfx(certDer, pkcs8Key);
         return new X509Certificate2(pfxBytes, string.Empty, X509KeyStorageFlags.Exportable);
+        }
     }
 
     /// <summary>

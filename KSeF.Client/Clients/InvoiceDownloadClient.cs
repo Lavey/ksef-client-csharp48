@@ -29,7 +29,7 @@ public class InvoiceDownloadClient : ClientBase, IInvoiceDownloadClient
 
         string endpoint = Routes.Invoices.ByKsefNumber(Uri.EscapeDataString(ksefNumber));
 
-        Dictionary<string, string> headers = new()
+        Dictionary<string, string> headers = new Dictionary<string, string>()
         {
             ["Accept"] = "application/xml"
         };

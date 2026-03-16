@@ -37,7 +37,7 @@ public class SignatureService
         Guard.ThrowIfNullOrWhiteSpace(xml);
         Guard.ThrowIfNull(certificate);
 
-        XmlDocument xmlDocument = new() { PreserveWhitespace = true };
+        XmlDocument xmlDocument = new XmlDocument() { PreserveWhitespace = true };
         xmlDocument.LoadXml(xml);
 
         Sign(xmlDocument, certificate);
@@ -110,7 +110,7 @@ public class SignatureService
              signatureId, signedPropertiesId,
              certificate, DateTimeOffset.UtcNow.Add(CertificateTimeBuffer));
 
-        DataObject dataObject = new() { Data = qualifyingProperties };
+        DataObject dataObject = new DataObject() { Data = qualifyingProperties };
 
         signedXml.AddDataObject(dataObject);
         signedXml.ComputeSignature();
@@ -157,7 +157,7 @@ public class SignatureService
         string certificateIssuerName = signingCertificate.Issuer;
         string certificateSerialNumber = new BigInteger(signingCertificate.GetSerialNumber()).ToString(CultureInfo.InvariantCulture);
 
-        XmlDocument document = new();
+        XmlDocument document = new XmlDocument();
         document.LoadXml(
         $"""
         <xades:QualifyingProperties Target="#{signatureId}" xmlns:xades="{XadesNsUrl}" xmlns="{SignedXml.XmlDsigNamespaceUrl}">

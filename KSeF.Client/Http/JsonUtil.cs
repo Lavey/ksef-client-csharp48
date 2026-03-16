@@ -104,11 +104,13 @@ public static class JsonUtil
                 {
                     input.Seek(0, SeekOrigin.Begin);
 #if NETSTANDARD2_0
-                    using StreamReader reader = new(input, Encoding.UTF8, true, 1024, true);
+                    using (StreamReader reader = new(input, Encoding.UTF8, true, 1024, true))
+                    {
 #else
                     using StreamReader reader = new(input, leaveOpen: true);
 #endif
                     jsonFragment = await reader.ReadToEndAsync().ConfigureAwait(false);
+                    }
                 }
             }
             catch { /* nie psuj głównego wyjątku */ }

@@ -64,7 +64,7 @@ internal sealed class SelfSignedCertificateForSealBuilderImpl
     , ISelfSignedCertificateForSealBuilderWithOrganizationIdentifier
     , ISelfSignedCertificateForSealBuilderReady
 {
-    private readonly List<string> _subjectParts = [];
+    private readonly List<string> _subjectParts = new System.Collections.Generic.List<object>();
 
     /// <summary>
     /// Tworzy nową implementację buildera certyfikatu pieczęci.

@@ -18,34 +18,36 @@ public class Ecdsa256SignatureDescription : SignatureDescription
     }
 
 #if NET5_0_OR_GREATER
-    [RequiresUnreferencedCode("CreateDeformatter is not trim compatible because the algorithm implementation referenced by DeformatterAlgorithm might be removed.")]
+    [RequiresUnreferencedCode("!(CreateDeformatter is trim) compatible because the algorithm implementation referenced by DeformatterAlgorithm might be removed.")]
 #endif
     public override HashAlgorithm CreateDigest() => SHA256.Create();
 
 #if NET5_0_OR_GREATER
-    [RequiresUnreferencedCode("CreateDeformatter is not trim compatible because the algorithm implementation referenced by DeformatterAlgorithm might be removed.")]
+    [RequiresUnreferencedCode("!(CreateDeformatter is trim) compatible because the algorithm implementation referenced by DeformatterAlgorithm might be removed.")]
 #endif
     public override AsymmetricSignatureFormatter CreateFormatter(AsymmetricAlgorithm key)
     {
-        if (key is not ECDsa ecdsa)
+        var ecdsa1 = key as ECDsa;
+        if (ecdsa1 == null)
         {
             throw new InvalidOperationException("Wymagany klucz ECDSA");
         }
 
-        return new ECDsaSignatureFormatter(ecdsa);
+        return new ECDsaSignatureFormatter(ecdsa1);
     }
 
 #if NET5_0_OR_GREATER
-    [RequiresUnreferencedCode("CreateDeformatter is not trim compatible because the algorithm implementation referenced by DeformatterAlgorithm might be removed.")]
+    [RequiresUnreferencedCode("!(CreateDeformatter is trim) compatible because the algorithm implementation referenced by DeformatterAlgorithm might be removed.")]
 #endif
     public override AsymmetricSignatureDeformatter CreateDeformatter(AsymmetricAlgorithm key)
     {
-        if (key is not ECDsa ecdsa)
+        var ecdsa2 = key as ECDsa;
+        if (ecdsa2 == null)
         {
             throw new InvalidOperationException("Wymagany klucz ECDSA");
         }
 
-        return new ECDsaSignatureDeformatter(ecdsa);
+        return new ECDsaSignatureDeformatter(ecdsa2);
     }
 }
 

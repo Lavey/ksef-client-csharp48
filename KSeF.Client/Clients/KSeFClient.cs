@@ -49,7 +49,7 @@ public class KSeFClient : IKSeFClient
     {
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new();
+        StringBuilder urlBuilder = new StringBuilder();
 
         urlBuilder.Append("/v2/auth/sessions");
 
@@ -244,7 +244,7 @@ public class KSeFClient : IKSeFClient
     {
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new();
+        StringBuilder urlBuilder = new StringBuilder();
 
 #if NETSTANDARD2_0
         urlBuilder.Append(FormattableString.Invariant($"/v2/sessions?sessionType={sessionType}"));
@@ -292,7 +292,7 @@ public class KSeFClient : IKSeFClient
         Guard.ThrowIfNullOrWhiteSpace(sessionReferenceNumber);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new();
+        StringBuilder urlBuilder = new StringBuilder();
 
         urlBuilder.Append("/v2/sessions/");
         urlBuilder.Append(Uri.EscapeDataString(sessionReferenceNumber));
@@ -316,7 +316,7 @@ public class KSeFClient : IKSeFClient
         Guard.ThrowIfNullOrWhiteSpace(invoiceReferenceNumber);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new();
+        StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.Append("/v2/sessions/");
         urlBuilder.Append(Uri.EscapeDataString(sessionReferenceNumber));
         urlBuilder.Append("/invoices/");
@@ -333,7 +333,7 @@ public class KSeFClient : IKSeFClient
         Guard.ThrowIfNullOrWhiteSpace(sessionReferenceNumber);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new();
+        StringBuilder urlBuilder = new StringBuilder();
 
         urlBuilder.Append("/v2/sessions/");
         urlBuilder.Append(Uri.EscapeDataString(sessionReferenceNumber));
@@ -357,7 +357,7 @@ public class KSeFClient : IKSeFClient
         Guard.ThrowIfNullOrWhiteSpace(ksefNumber);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new();
+        StringBuilder urlBuilder = new StringBuilder();
 
         urlBuilder.Append("/v2/sessions/");
         urlBuilder.Append(Uri.EscapeDataString(sessionReferenceNumber));
@@ -378,7 +378,7 @@ public class KSeFClient : IKSeFClient
         Guard.ThrowIfNullOrWhiteSpace(invoiceReferenceNumber);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new();
+        StringBuilder urlBuilder = new StringBuilder();
 
         urlBuilder.Append("/v2/sessions/");
         urlBuilder.Append(Uri.EscapeDataString(sessionReferenceNumber));
@@ -398,7 +398,7 @@ public class KSeFClient : IKSeFClient
         Guard.ThrowIfNullOrWhiteSpace(upoReferenceNumber);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new();
+        StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.Append("/v2/sessions/");
         urlBuilder.Append(Uri.EscapeDataString(sessionReferenceNumber));
         urlBuilder.Append("/upo/");
@@ -415,7 +415,7 @@ public class KSeFClient : IKSeFClient
         Guard.ThrowIfNullOrWhiteSpace(ksefNumber);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new();
+        StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.Append("/v2/invoices/ksef/");
         urlBuilder.Append(Uri.EscapeDataString(ksefNumber));
 
@@ -449,7 +449,7 @@ public class KSeFClient : IKSeFClient
         Guard.ThrowIfNullOrWhiteSpace(operationReferenceNumber);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new();
+        StringBuilder urlBuilder = new StringBuilder();
 
         urlBuilder.Append("/v2/permissions/operations/");
         urlBuilder.Append(Uri.EscapeDataString(operationReferenceNumber));

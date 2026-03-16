@@ -62,7 +62,7 @@ namespace KSeF.Client.Api.Builders.AuthorizationEntityPermissions
         /// <inheritdoc />
         private sealed class Impl : IOwnerNipStep, IOptionalStep
         {
-            private readonly EntityAuthorizationsQueryRequest _request = new();
+            private readonly EntityAuthorizationsQueryRequest _request = new private readonly EntityAuthorizationsQueryRequest();
 
             /// <inheritdoc />
             public IOptionalStep ReceivedForOwnerNip(string ownerNip)

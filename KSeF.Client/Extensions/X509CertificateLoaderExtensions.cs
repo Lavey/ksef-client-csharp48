@@ -119,9 +119,8 @@ namespace KSeF.Client.Extensions
                 ?? throw new NotSupportedException("Certyfikat nie zawiera klucza publicznego OID.");
 
             // Na netstandard2.0 polyfill StringCompat.Contains zapewnia tę samą sygnaturę co .NET 8+.
-            bool isEncrypted = privateKeyPem.Contains(
-                "ENCRYPTED PRIVATE KEY",
-                StringComparison.OrdinalIgnoreCase);
+            bool isEncrypted = privateKeyPem.IndexOf(
+                "ENCRYPTED PRIVATE KEY", System.StringComparison.OrdinalIgnoreCase) >= 0;
 
             if (isEncrypted && string.IsNullOrEmpty(password))
             {
@@ -132,7 +131,8 @@ namespace KSeF.Client.Extensions
 
             if (oid == RsaOid)
             {
-                using RSA rsa = RSA.Create();
+                using (RSA rsa = RSA.Create())
+                {
                 if (isEncrypted)
                 {
                     rsa.ImportFromEncryptedPem(privateKeyPem, password);
@@ -143,10 +143,12 @@ namespace KSeF.Client.Extensions
                 }
 
                 return publicCert.CopyWithPrivateKey(rsa);
+                }
             }
             else if (oid == EcOid)
             {
-                using ECDsa ecdsa = ECDsa.Create();
+                using (ECDsa ecdsa = ECDsa.Create())
+                {
 
 #if NET5_0_OR_GREATER
                 try
@@ -169,6 +171,7 @@ namespace KSeF.Client.Extensions
 #endif
 
                 return publicCert.CopyWithPrivateKey(ecdsa);
+                }
             }
 
             throw new NotSupportedException(
@@ -215,7 +218,8 @@ namespace KSeF.Client.Extensions
                     nameof(password));
             }
 
-            using ECDsa ecdsa = ECDsa.Create();
+            using (ECDsa ecdsa = ECDsa.Create())
+            {
 
             byte[] encryptedPkcs8 = ExtractEncryptedPkcs8FromPem(privateKeyPem);
 
@@ -248,6 +252,7 @@ namespace KSeF.Client.Extensions
                     $"Nie udało się całkowicie zaimportować {nameof(Pkcs8PrivateKeyInfo)}. BytesRead={importedBytes}, Total={pkcs8Der.Length}.");
             }
             return publicCert.CopyWithPrivateKey(ecdsa);
+            }
         }
 
         private static bool IsPkcs8PasswordError(CryptographicException cryptographyException)
@@ -259,8 +264,8 @@ namespace KSeF.Client.Extensions
 
             string message = cryptographyException.Message ?? string.Empty;
 
-            return message.Contains("EncryptedPrivateKeyInfo", StringComparison.OrdinalIgnoreCase)
-                || message.Contains("password may be incorrect", StringComparison.OrdinalIgnoreCase);
+            return message.IndexOf("EncryptedPrivateKeyInfo", System.StringComparison.OrdinalIgnoreCase) >= 0
+                || message.IndexOf("password may be incorrect", System.StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private static byte[] ExtractEncryptedPkcs8FromPem(string pem)

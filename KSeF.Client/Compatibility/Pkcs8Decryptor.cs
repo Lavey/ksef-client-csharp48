@@ -178,8 +178,10 @@ internal static class Pkcs8Decryptor
         // Dla SHA-1 użyj wbudowanej klasy. Dla pozostałych — implementacja ręczna.
         if (prfOid == HmacSha1Oid)
         {
-            using Rfc2898DeriveBytes pbkdf2 = new Rfc2898DeriveBytes(password, salt, iterations);
+            using (Rfc2898DeriveBytes pbkdf2 = new Rfc2898DeriveBytes(password, salt, iterations))
+            {
             return pbkdf2.GetBytes(keyLength);
+            }
         }
 
         // Ręczna implementacja PBKDF2 dla PRF innych niż SHA1
@@ -193,7 +195,8 @@ internal static class Pkcs8Decryptor
     /// </summary>
     private static byte[] Pbkdf2Manual(byte[] password, byte[] salt, int iterations, int keyLength, string prfOid)
     {
-        using HMAC hmac = CreateHmac(prfOid, password);
+        using (HMAC hmac = CreateHmac(prfOid, password))
+        {
         int hashLength = hmac.HashSize / 8;
         int blocksNeeded = (keyLength + hashLength - 1) / hashLength;
 
@@ -209,6 +212,7 @@ internal static class Pkcs8Decryptor
         }
 
         return derivedKey;
+        }
     }
 
     /// <summary>
@@ -292,8 +296,10 @@ internal static class Pkcs8Decryptor
             algorithm.Key = key;
             algorithm.IV = iv;
 
-            using ICryptoTransform decryptor = algorithm.CreateDecryptor();
+            using (ICryptoTransform decryptor = algorithm.CreateDecryptor())
+            {
             return decryptor.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
+            }
         }
     }
 
