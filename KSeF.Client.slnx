@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="KSeF.Client.ClientFactory/KSeF.Client.ClientFactory.csproj" />
+  <Project Path="KSeF.Client.Core/KSeF.Client.Core.csproj" />
+  <Project Path="KSeF.Client/KSeF.Client.csproj" />
+</Solution>
