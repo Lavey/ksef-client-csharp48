@@ -399,14 +399,11 @@ internal static class EcdsaCompat
     internal static int GetCoordSize(ECCurve curve)
     {
         string oid = curve.Oid?.Value;
-        return oid switch
-        {
-            NistP256Oid => 32,
-            NistP384Oid => 48,
-            NistP521Oid => 66,
-            _ => throw new CryptographicException(
-                $"Nie można określić rozmiaru współrzędnej dla krzywej EC o OID '{oid}'.")
-        };
+        if (oid == NistP256Oid) return 32;
+        if (oid == NistP384Oid) return 48;
+        if (oid == NistP521Oid) return 66;
+        throw new CryptographicException(
+            $"Nie można określić rozmiaru współrzędnej dla krzywej EC o OID '{oid}'.");
     }
 
     /// <summary>
@@ -414,13 +411,10 @@ internal static class EcdsaCompat
     /// </summary>
     internal static ECCurve CurveFromOid(string oid)
     {
-        return oid switch
-        {
-            NistP256Oid => ECCurve.NamedCurves.nistP256,
-            NistP384Oid => ECCurve.NamedCurves.nistP384,
-            NistP521Oid => ECCurve.NamedCurves.nistP521,
-            _ => throw new CryptographicException($"Nieobsługiwana krzywa EC o OID '{oid}'.")
-        };
+        if (oid == NistP256Oid) return ECCurve.NamedCurves.nistP256;
+        if (oid == NistP384Oid) return ECCurve.NamedCurves.nistP384;
+        if (oid == NistP521Oid) return ECCurve.NamedCurves.nistP521;
+        throw new CryptographicException($"Nieobsługiwana krzywa EC o OID '{oid}'.");
     }
 
     /// <summary>
@@ -434,14 +428,11 @@ internal static class EcdsaCompat
 
         // Spróbuj dopasować po przyjaznej nazwie
         string name = curve.Oid?.FriendlyName;
-        return name switch
-        {
-            "nistP256" or "ECDSA_P256" => NistP256Oid,
-            "nistP384" or "ECDSA_P384" => NistP384Oid,
-            "nistP521" or "ECDSA_P521" => NistP521Oid,
-            _ => throw new CryptographicException(
-                $"Nie można określić OID dla krzywej EC '{name}'.")
-        };
+        if (name == "nistP256" || name == "ECDSA_P256") return NistP256Oid;
+        if (name == "nistP384" || name == "ECDSA_P384") return NistP384Oid;
+        if (name == "nistP521" || name == "ECDSA_P521") return NistP521Oid;
+        throw new CryptographicException(
+            $"Nie można określić OID dla krzywej EC '{name}'.");
     }
 
     #endregion

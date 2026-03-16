@@ -47,7 +47,8 @@ internal static class SelfSignedCertificateCompat
         keyParams.Parameters.Add(new CngProperty("Length", BitConverter.GetBytes(2048), CngPropertyOptions.None));
         using (CngKey cngKey = CngKey.Create(CngAlgorithm.Rsa, null, keyParams))
         {
-        using RSACng rsa = new RSACng(cngKey);
+        using (RSACng rsa = new RSACng(cngKey))
+        {
 
         byte[] tbsCert = BuildTbsCertificate(subjectDN, rsa, notBefore, notAfter, isEcdsa: false);
         byte[] signature = rsa.SignData(tbsCert, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
@@ -60,6 +61,7 @@ internal static class SelfSignedCertificateCompat
         // Buduj PFX ręcznie z ASN.1 (certDer + pkcs8Key) i reimportuj z Exportable.
         byte[] pfxBytes = BuildPfx(certDer, pkcs8Key);
         return new X509Certificate2(pfxBytes, string.Empty, X509KeyStorageFlags.Exportable);
+        }
         }
     }
 
@@ -284,13 +286,13 @@ internal static class SelfSignedCertificateCompat
     {
         ECParameters p = ecdsa.ExportParameters(false);
         string curveOid = EcdsaCompat.CurveToOid(p.Curve);
-        int coordLen = p.Q.X!.Length;
+        int coordLen = p.Q.X.Length;
 
         // Punkt nieskompresowany: 0x04 || X || Y
         byte[] point = new byte[1 + coordLen * 2];
         point[0] = 0x04;
-        Buffer.BlockCopy(p.Q.X!, 0, point, 1, coordLen);
-        Buffer.BlockCopy(p.Q.Y!, 0, point, 1 + coordLen, coordLen);
+        Buffer.BlockCopy(p.Q.X, 0, point, 1, coordLen);
+        Buffer.BlockCopy(p.Q.Y, 0, point, 1 + coordLen, coordLen);
 
         // SubjectPublicKeyInfo
         writer.PushSequence();
@@ -487,7 +489,7 @@ internal static class SelfSignedCertificateCompat
     private static byte[] ExportEcPrivateKeyPkcs8(ECParameters p)
     {
         string curveOid = NistP256Oid;
-        int coordLen = p.Q.X!.Length;
+        int coordLen = p.Q.X.Length;
 
         // ECPrivateKey (RFC 5915)
         AsnWriter ecKey = new AsnWriter(AsnEncodingRules.DER);
@@ -498,7 +500,7 @@ internal static class SelfSignedCertificateCompat
         byte[] point = new byte[1 + coordLen * 2];
         point[0] = 0x04;
         Buffer.BlockCopy(p.Q.X, 0, point, 1, coordLen);
-        Buffer.BlockCopy(p.Q.Y!, 0, point, 1 + coordLen, coordLen);
+        Buffer.BlockCopy(p.Q.Y, 0, point, 1 + coordLen, coordLen);
         Asn1Tag ctx1 = new Asn1Tag(TagClass.ContextSpecific, 1, isConstructed: true);
         ecKey.PushSequence(ctx1);
         ecKey.WriteBitString(point);

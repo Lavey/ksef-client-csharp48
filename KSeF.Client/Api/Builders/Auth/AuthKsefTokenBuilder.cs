@@ -1,3 +1,4 @@
+using KSeF.Client.Compatibility;
 using KSeF.Client.Core.Models.Authorization;
 using KSeF.Client.Validation;
 

@@ -107,7 +107,7 @@ internal sealed class SelfSignedCertificateForSignatureBuilderImpl
     , ISelfSignedCertificateForSignatureBuilderReady
     , ISelfSignedCertificateForSignatureBuilderWithEncryption
 {
-    private readonly List<string> _subjectParts = new System.Collections.Generic.List<object>();
+    private readonly List<string> _subjectParts = new List<string>();
     private EncryptionMethodEnum _encryptionType = EncryptionMethodEnum.Rsa;
 
     /// <summary>
@@ -186,7 +186,7 @@ internal sealed class SelfSignedCertificateForSignatureBuilderImpl
                 DateTimeOffset.UtcNow.AddYears(2));
         }
 #else
-        X500DistinguishedName subjectName = new(subjectDN);
+        X500DistinguishedName subjectName = new X500DistinguishedName(subjectDN);
 
         // NAPRAWA: DateTimeOffset.UtcNow zamiast .Now — spójność z NotBefore (UTC).
         // Mieszanie .UtcNow (NotBefore) z .Now (NotAfter) powodowało zależność certyfikatu
@@ -194,9 +194,11 @@ internal sealed class SelfSignedCertificateForSignatureBuilderImpl
         CertificateRequest request;
         if (_encryptionType == EncryptionMethodEnum.ECDsa)
         {
-            using ECDsa ecdsa = ECDsa.Create(); // P-256
+            using (ECDsa ecdsa = ECDsa.Create()) // P-256
+            {
             request = new CertificateRequest(subjectName, ecdsa, HashAlgorithmName.SHA256);
             return request.CreateSelfSigned(DateTimeOffset.UtcNow.AddMinutes(-61), DateTimeOffset.UtcNow.AddYears(2));
+            }
         }
         else
         {

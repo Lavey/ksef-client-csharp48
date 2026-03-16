@@ -1,6 +1,7 @@
 using KSeF.Client.Core.Models.Permissions.EuEntityRepresentative;
 using KSeF.Client.Core.Models.Permissions.Identifiers;
 using KSeF.Client.Validation;
+using KSeF.Client.Compatibility;
 
 using System.Collections.Generic;
 using System;

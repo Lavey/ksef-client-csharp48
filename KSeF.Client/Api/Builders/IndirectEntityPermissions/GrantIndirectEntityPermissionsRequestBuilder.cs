@@ -1,3 +1,4 @@
+using KSeF.Client.Compatibility;
 using KSeF.Client.Core.Models.Permissions.Identifiers;
 using KSeF.Client.Core.Models.Permissions.IndirectEntity;
 using KSeF.Client.Validation;

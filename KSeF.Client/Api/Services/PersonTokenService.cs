@@ -12,7 +12,7 @@ namespace KSeF.Client.Api.Services
 /// <inheritdoc/>
 public class PersonTokenService : IPersonTokenService
 {
-    private static readonly JsonSerializerOptions _jsonSerializerOptions = new private static readonly JsonSerializerOptions()
+    private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
     {
         PropertyNameCaseInsensitive = true
     };
@@ -23,22 +23,24 @@ public class PersonTokenService : IPersonTokenService
         JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
         JwtSecurityToken jwtToken = handler.ReadJwtToken(jwt);
 
-        IEnumerable<Claim> claims = new[] { .. jwtToken.Claims };
-
+            IEnumerable<Claim> claims = jwtToken.Claims;
         string Get(string type) =>
             claims.FirstOrDefault(c => c.Type.Equals(type, StringComparison.OrdinalIgnoreCase))?.Value;
 
         string[] GetMany(params string[] types) =>
-            [.. claims.Where(c => types.Contains(c.Type, StringComparer.OrdinalIgnoreCase))
+            claims.Where(c => types.Contains(c.Type, StringComparer.OrdinalIgnoreCase))
                   .Select(c => c.Value)
-                  .Distinct(StringComparer.OrdinalIgnoreCase)];
+                  .Distinct(StringComparer.OrdinalIgnoreCase)
+                  .ToArray();
 
-        DateTimeOffset? exp = jwtToken.Payload.Expiration is { } e
-            ? DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(e))
+        long? expRaw = jwtToken.Payload.Expiration;
+        DateTimeOffset? exp = expRaw.HasValue
+            ? (DateTimeOffset?)DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(expRaw.Value))
             : null;
 
-        DateTimeOffset? iat = jwtToken.Payload.IssuedAt is { } i
-            ? new DateTimeOffset(i.ToUniversalTime())
+        DateTime? iatRaw = jwtToken.Payload.IssuedAt;
+        DateTimeOffset? iat = iatRaw.HasValue
+            ? (DateTimeOffset?)new DateTimeOffset(iatRaw.Value.ToUniversalTime())
             : null;
 
         TokenSubjectDetails subjectDetails = TryParseJson<TokenSubjectDetails>(Get("sud"));
@@ -55,15 +57,16 @@ public class PersonTokenService : IPersonTokenService
          };
         string[] classicRoles = GetMany(roleTypes);
 
-        string[] unifiedRoles = new[] { .. classicRoles
+        string[] unifiedRoles = classicRoles
             .Concat(per)
             .Concat(rol)
-            .Distinct(StringComparer.OrdinalIgnoreCase) };
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
 
         return new PersonToken
         {
             Issuer = jwtToken.Issuer,
-            Audiences = jwtToken.Audiences?.ToArray() ?? [],
+            Audiences = jwtToken.Audiences?.ToArray() ?? new string[0],
             IssuedAt = iat,
             ExpiresAt = exp,
 
@@ -105,7 +108,7 @@ public class PersonTokenService : IPersonTokenService
     {
         if (string.IsNullOrWhiteSpace(maybeJsonArray))
         {
-            return [];
+            return new string[0];
         }
 
         try
@@ -115,12 +118,13 @@ public class PersonTokenService : IPersonTokenService
             {
             if (doc.RootElement.ValueKind == JsonValueKind.Array)
             {
-                return [.. doc.RootElement
+                return doc.RootElement
                           .EnumerateArray()
                           .Where(e => e.ValueKind == JsonValueKind.String)
-                          .Select(e => e.GetString()!)
+                          .Select(e => e.GetString())
                           .Where(v => !string.IsNullOrWhiteSpace(v))
-                          .Distinct(StringComparer.OrdinalIgnoreCase)];
+                          .Distinct(StringComparer.OrdinalIgnoreCase)
+                          .ToArray();
             }
             }
         }
@@ -128,13 +132,14 @@ public class PersonTokenService : IPersonTokenService
 
         if (maybeJsonArray.Contains(','))
         {
-            return [.. maybeJsonArray.Split(',')
+            return maybeJsonArray.Split(',')
                                  .Select(x => x.Trim().Trim('"'))
                                  .Where(x => !string.IsNullOrWhiteSpace(x))
-                                 .Distinct(StringComparer.OrdinalIgnoreCase)];
+                                 .Distinct(StringComparer.OrdinalIgnoreCase)
+                                 .ToArray();
         }
 
-        return [maybeJsonArray.Trim().Trim('"')];
+        return new[] { maybeJsonArray.Trim().Trim('"') };
     }
 
     private static string UnwrapIfQuotedJson(string s)

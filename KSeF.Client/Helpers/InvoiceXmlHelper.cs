@@ -94,7 +94,7 @@ public static class InvoiceXmlHelper
             .Descendants(ns + parentElement.ToXmlName())
             .SelectMany(p => p.Descendants(ns + targetElement.ToXmlName()))
             .Select(e => e.Value ?? "")
-            .ToList() ?? [];
+            .ToList() ?? new List<string>();
     }
 }
 

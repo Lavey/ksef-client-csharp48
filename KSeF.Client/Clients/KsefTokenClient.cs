@@ -44,7 +44,7 @@ public class KsefTokenClient : ClientBase, IKsefTokenClient
     {
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new(Routes.Tokens.Root);
+        StringBuilder urlBuilder = new StringBuilder(Routes.Tokens.Root);
         bool hasQuery = false;
 
         void AppendQuery(string name, string value)
@@ -63,7 +63,7 @@ public class KsefTokenClient : ClientBase, IKsefTokenClient
             urlBuilder.Append(Uri.EscapeDataString(value));
         }
 
-        if (statuses is { Count: > 0 })
+        if (statuses != null && statuses.Count > 0)
         {
             foreach (AuthenticationKsefTokenStatus s in statuses)
             {

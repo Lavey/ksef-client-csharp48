@@ -41,8 +41,14 @@ namespace KSeF.Client.ClientFactory
     /// <remarks>
     /// Fabryka korzysta z nazwanego <c>HttpClient</c>, którego nazwa jest zgodna z nazwą środowiska.
     /// </remarks>
-    public class KSeFClientFactory(IHttpClientFactory factory) : IKSeFClientFactory
+    public class KSeFClientFactory : IKSeFClientFactory
     {
+        private readonly IHttpClientFactory factory;
+
+        public KSeFClientFactory(IHttpClientFactory factory)
+        {
+            this.factory = factory;
+        }
         /// <summary>
         /// Tworzy instancję klienta KSeF dla podanego środowiska.
         /// </summary>

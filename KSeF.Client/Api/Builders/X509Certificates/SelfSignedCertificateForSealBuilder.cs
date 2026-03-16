@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System;
-﻿using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
 namespace KSeF.Client.Api.Builders.X509Certificates
@@ -64,7 +63,7 @@ internal sealed class SelfSignedCertificateForSealBuilderImpl
     , ISelfSignedCertificateForSealBuilderWithOrganizationIdentifier
     , ISelfSignedCertificateForSealBuilderReady
 {
-    private readonly List<string> _subjectParts = new System.Collections.Generic.List<object>();
+    private readonly List<string> _subjectParts = new System.Collections.Generic.List<string>();
 
     /// <summary>
     /// Tworzy nową implementację buildera certyfikatu pieczęci.

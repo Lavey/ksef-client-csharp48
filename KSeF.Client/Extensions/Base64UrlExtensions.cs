@@ -17,7 +17,7 @@ namespace KSeF.Client.Extensions
         base64String = base64String.Trim();
 
         // jeśli wygląda na Base64URL -> zamień na Base64
-        if (base64String.Contains('-') || base64String.Contains('_'))
+        if (base64String.Contains("-") || base64String.Contains("_"))
         {
             base64String = base64String.Replace('-', '+').Replace('_', '/');
         }

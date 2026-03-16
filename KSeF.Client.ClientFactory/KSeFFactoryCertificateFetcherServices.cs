@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using System;
-﻿#nullable enable
 using KSeF.Client.Core.Interfaces.Clients;
 using KSeF.Client.Core.Interfaces.Services;
 
@@ -60,18 +59,23 @@ namespace KSeF.Client.ClientFactory
     /// były tworzone tylko raz dla każdego środowiska. Obsługuje środowiska: Test, Demo, Prod.
     /// Dodatkowo obsługuje problemy z certyfikatem na podstawie kodów błędów z KSeF.
     /// </remarks>
-    public class KSeFFactoryCertificateFetcherServices(
-        IKSeFFactoryCryptographyServices kSeFFactoryCryptographyServices)
-        : IKSeFFactoryCertificateFetcherServices
+    public class KSeFFactoryCertificateFetcherServices : IKSeFFactoryCertificateFetcherServices
     {
+        private readonly IKSeFFactoryCryptographyServices kSeFFactoryCryptographyServices;
+
+        public KSeFFactoryCertificateFetcherServices(
+            IKSeFFactoryCryptographyServices kSeFFactoryCryptographyServices)
+        {
+            this.kSeFFactoryCryptographyServices = kSeFFactoryCryptographyServices;
+        }
         private Task<ICertificateFetcher> demoFetcherService;
-        private readonly object demoFetcherServiceLock = new();
+        private readonly object demoFetcherServiceLock = new object();
 
         private Task<ICertificateFetcher> prodFetcherService;
-        private readonly object prodFetcherServiceLock = new();
+        private readonly object prodFetcherServiceLock = new object();
 
         private Task<ICertificateFetcher> testFetcherService;
-        private readonly object testFetcherServiceLock = new();
+        private readonly object testFetcherServiceLock = new object();
 
         /// <summary>
         /// Pobiera lub tworzy instancję <see cref="ICertificateFetcher"/> dla podanego środowiska.

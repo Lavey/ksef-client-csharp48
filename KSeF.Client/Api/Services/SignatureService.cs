@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
 using System.Xml;
+using KSeF.Client.Compatibility;
 
 using System.Collections.Generic;
 using System.Linq;
@@ -88,7 +89,7 @@ public class SignatureService
         string signatureId = "Signature";
         string signedPropertiesId = "SignedProperties";
 
-        SignedXmlFixed signedXml = new(xmlDocument);
+        SignedXmlFixed signedXml = new SignedXmlFixed(xmlDocument);
 
         if (rsaKey != null)
         {
@@ -129,7 +130,7 @@ public class SignatureService
 
     private static void AddRootReference(SignedXml signedXml)
     {
-        Reference rootReference = new(string.Empty);
+        Reference rootReference = new Reference(string.Empty);
         rootReference.AddTransform(new XmlDsigEnvelopedSignatureTransform());
         rootReference.AddTransform(new XmlDsigExcC14NTransform());
         signedXml.AddReference(rootReference);
@@ -137,7 +138,7 @@ public class SignatureService
 
     private static void AddSignedPropertiesReference(SignedXml signedXml, string id)
     {
-        Reference xadesReference = new("#" + id)
+        Reference xadesReference = new Reference("#" + id)
         {
             Type = SignedPropertiesType
         };
@@ -159,27 +160,23 @@ public class SignatureService
 
         XmlDocument document = new XmlDocument();
         document.LoadXml(
-        $"""
-        <xades:QualifyingProperties Target="#{signatureId}" xmlns:xades="{XadesNsUrl}" xmlns="{SignedXml.XmlDsigNamespaceUrl}">
-          <xades:SignedProperties Id="{signedPropertiesId}">
-            <xades:SignedSignatureProperties>
-              <xades:SigningTime>{signingTime:O}</xades:SigningTime>
-              <xades:SigningCertificate>
-                <xades:Cert>
-                  <xades:CertDigest>
-                    <DigestMethod Algorithm="{SignedXml.XmlDsigSHA256Url}" />
-                    <DigestValue>{certificateDigest}</DigestValue>
-                  </xades:CertDigest>
-                  <xades:IssuerSerial>
-                    <X509IssuerName>{certificateIssuerName}</X509IssuerName>
-                    <X509SerialNumber>{certificateSerialNumber}</X509SerialNumber>
-                  </xades:IssuerSerial>
-                </xades:Cert>
-              </xades:SigningCertificate>
-            </xades:SignedSignatureProperties>
-          </xades:SignedProperties>
-        </xades:QualifyingProperties>
-        """);
+            $@"<xades:QualifyingProperties Target=""#{signatureId}"" xmlns:xades=""{XadesNsUrl}"" xmlns=""{SignedXml.XmlDsigNamespaceUrl}"">"
+            + $@"<xades:SignedProperties Id=""{signedPropertiesId}"">"
+            + $@"<xades:SignedSignatureProperties>"
+            + $@"<xades:SigningTime>{signingTime:O}</xades:SigningTime>"
+            + $@"<xades:SigningCertificate><xades:Cert>"
+            + $@"<xades:CertDigest>"
+            + $@"<DigestMethod Algorithm=""{SignedXml.XmlDsigSHA256Url}"" />"
+            + $@"<DigestValue>{certificateDigest}</DigestValue>"
+            + @"</xades:CertDigest>"
+            + $@"<xades:IssuerSerial>"
+            + $@"<X509IssuerName>{certificateIssuerName}</X509IssuerName>"
+            + $@"<X509SerialNumber>{certificateSerialNumber}</X509SerialNumber>"
+            + @"</xades:IssuerSerial>"
+            + @"</xades:Cert></xades:SigningCertificate>"
+            + @"</xades:SignedSignatureProperties>"
+            + @"</xades:SignedProperties>"
+            + @"</xades:QualifyingProperties>");
 
         return document.ChildNodes;
     }

@@ -7,6 +7,7 @@ using KSeF.Client.Extensions;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using KSeF.Client.Compatibility;
 
 namespace KSeF.Client.Api.Services
 {
@@ -92,7 +93,7 @@ namespace KSeF.Client.Api.Services
         {
             // 1. SHA-256
             byte[] sha;
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NET48
             sha = HashCompat.SHA256HashData(Encoding.UTF8.GetBytes(pathToSign));
 #else
             sha = SHA256.HashData(Encoding.UTF8.GetBytes(pathToSign));
@@ -104,7 +105,7 @@ namespace KSeF.Client.Api.Services
                 {
                     privateKey = string.Concat(
                         privateKey
-                            .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
+                            .Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
                             .Where(l => !l.StartsWith("-----", StringComparison.Ordinal))
                     );
                 }
@@ -119,7 +120,7 @@ namespace KSeF.Client.Api.Services
                         using (RSA rsaTemp = RSA.Create())
                         {
                         rsaTemp.ImportRSAPrivateKey(privateKeyBytes, out _);
-                        cert = cert.CopyWithPrivateKey(rsaTemp);
+                        cert = RSACertificateExtensions.CopyWithPrivateKey(cert, rsaTemp);
                         }
                     }
                     else if (cert.GetECDsaPublicKey() != null)
@@ -127,7 +128,7 @@ namespace KSeF.Client.Api.Services
                         using (ECDsa ecdsaTemp = ECDsa.Create())
                         {
                         ecdsaTemp.ImportPkcs8PrivateKey(privateKeyBytes, out _);
-                        cert = cert.CopyWithPrivateKey(ecdsaTemp);
+                        cert = ECDsaCertificateExtensions.CopyWithPrivateKey(cert, ecdsaTemp);
                         }
                     }
                     else
@@ -144,7 +145,7 @@ namespace KSeF.Client.Api.Services
             }
             else if (cert.GetECDsaPrivateKey() is ECDsa ecdsa)
             {
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NET48
                 signature = ecdsa.SignHash(sha);
 #else
                 signature = ecdsa.SignHash(sha, dSASignatureFormat);

@@ -1,3 +1,4 @@
+using KSeF.Client.Compatibility;
 using KSeF.Client.Core.Exceptions;
 using KSeF.Client.Core.Infrastructure.Rest;
 using KSeF.Client.Core.Interfaces.Rest;
@@ -95,11 +96,11 @@ public sealed class RestClient : IRestClient
             throw new ArgumentException("Adres URL nie może być pusty.", nameof(url));
         }
 
-        using (HttpRequestMessage httpRequestMessage = new(method, url))
+        using (HttpRequestMessage httpRequestMessage = new HttpRequestMessage(method, url))
         {
 
-        bool shouldSendBody = method != HttpMethod.Get &&
-                              !EqualityComparer<TRequest>.Default.Equals(requestBody, default);
+        bool shouldSendBody =
+                              !EqualityComparer<TRequest>.Default.Equals(requestBody, default(TRequest));
 
         if (shouldSendBody)
         {
@@ -146,10 +147,11 @@ public sealed class RestClient : IRestClient
 
         Guard.ThrowIfNull(content);
 
-        using HttpRequestMessage httpRequestMessage = new(method, url)
+        using (HttpRequestMessage httpRequestMessage = new HttpRequestMessage(method, url)
         {
             Content = content
-        };
+        })
+        {
 
         if (additionalHeaders != null)
         {
@@ -160,6 +162,7 @@ public sealed class RestClient : IRestClient
         }
 
         await SendCoreAsync<object>(httpRequestMessage, cancellationToken).ConfigureAwait(false);
+        }
     }
 
     /// <inheritdoc />
@@ -189,7 +192,7 @@ public sealed class RestClient : IRestClient
             throw new ArgumentException("Adres URL nie może być pusty.", nameof(url));
         }
 
-        using (HttpRequestMessage httpRequestMessage = new(method, url))
+        using (HttpRequestMessage httpRequestMessage = new HttpRequestMessage(method, url))
         {
 
         if (!string.IsNullOrWhiteSpace(token))
@@ -209,9 +212,11 @@ public sealed class RestClient : IRestClient
 
         using (HttpRequestMessage httpRequestMessage = request.ToHttpRequestMessage(httpClient))
         {
-        using CancellationTokenSource cancellationTokenSource = CreateTimeoutCancellationTokenSource(request.Timeout, cancellationToken);
+        using (CancellationTokenSource cancellationTokenSource = CreateTimeoutCancellationTokenSource(request.Timeout, cancellationToken))
+        {
 
         return await SendCoreAsync<TResponse>(httpRequestMessage, cancellationTokenSource.Token).ConfigureAwait(false);
+        }
         }
     }
 
@@ -238,9 +243,11 @@ public sealed class RestClient : IRestClient
 
         using (HttpRequestMessage httpRequestMessage = request.ToHttpRequestMessage(httpClient, DefaultContentType))
         {
-        using CancellationTokenSource cancellationTokenSource = CreateTimeoutCancellationTokenSource(request.Timeout, cancellationToken);
+        using (CancellationTokenSource cancellationTokenSource = CreateTimeoutCancellationTokenSource(request.Timeout, cancellationToken))
+        {
 
         return await SendCoreAsync<TResponse>(httpRequestMessage, cancellationTokenSource.Token).ConfigureAwait(false);
+        }
         }
     }
 
@@ -251,9 +258,10 @@ public sealed class RestClient : IRestClient
     // ================== Core ==================
     private async Task<T> SendCoreAsync<T>(HttpRequestMessage httpRequestMessage, CancellationToken cancellationToken)
     {
-        using HttpResponseMessage httpResponseMessage = await httpClient
+        using (HttpResponseMessage httpResponseMessage = await httpClient
             .SendAsync(httpRequestMessage, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
-            .ConfigureAwait(false);
+            .ConfigureAwait(false))
+        {
 
         bool hasContent = httpResponseMessage.HasBody(httpRequestMessage.Method);
 
@@ -261,7 +269,7 @@ public sealed class RestClient : IRestClient
         {
             if (!hasContent || typeof(T) == typeof(object))
             {
-                return default!;
+                return default(T);
             }
 
             if (typeof(T) == typeof(string))
@@ -281,26 +289,31 @@ public sealed class RestClient : IRestClient
 #if NETSTANDARD2_0
             using (Stream responseStream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false))
             {
-#else
-            using Stream responseStream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
-#endif
-            return await JsonUtil.DeserializeAsync<T>(responseStream).ConfigureAwait(false);
+                return await JsonUtil.DeserializeAsync<T>(responseStream).ConfigureAwait(false);
             }
+#else
+            using (Stream responseStream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false))
+            {
+                return await JsonUtil.DeserializeAsync<T>(responseStream).ConfigureAwait(false);
+            }
+#endif
         }
 
         await HandleInvalidStatusCode(httpResponseMessage, cancellationToken).ConfigureAwait(false);
         throw new InvalidOperationException("HandleInvalidStatusCode musi zgłosić wyjątek.");
+        }
     }
 
     private async Task<RestResponse<T>> SendCoreWithHeadersAsync<T>(HttpRequestMessage httpRequestMessage, CancellationToken cancellationToken)
     {
-        using HttpResponseMessage httpResponseMessage = await httpClient
+        using (HttpResponseMessage httpResponseMessage = await httpClient
             .SendAsync(httpRequestMessage, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
-            .ConfigureAwait(false);
+            .ConfigureAwait(false))
+        {
 
         bool hasContent = httpResponseMessage.HasBody(httpRequestMessage.Method);
 
-        Dictionary<string, IEnumerable<string>> headers = new(StringComparer.OrdinalIgnoreCase);
+        Dictionary<string, IEnumerable<string>> headers = new Dictionary<string, IEnumerable<string>>(StringComparer.OrdinalIgnoreCase);
 
         foreach (KeyValuePair<string, IEnumerable<string>> header in httpResponseMessage.Headers)
         {
@@ -319,7 +332,7 @@ public sealed class RestClient : IRestClient
         {
             if (!hasContent || typeof(T) == typeof(object))
             {
-                return new RestResponse<T>(default!, headers);
+                return new RestResponse<T>(default(T), headers);
             }
 
             if (typeof(T) == typeof(string))
@@ -339,18 +352,22 @@ public sealed class RestClient : IRestClient
 #if NETSTANDARD2_0
             using (Stream responseStream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false))
             {
-#else
-            using Stream responseStream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
-#endif
-            T body = await JsonUtil.DeserializeAsync<T>(responseStream).ConfigureAwait(false);
-            return new RestResponse<T>(body, headers);
+                T body = await JsonUtil.DeserializeAsync<T>(responseStream).ConfigureAwait(false);
+                return new RestResponse<T>(body, headers);
             }
+#else
+            using (Stream responseStream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false))
+            {
+                T body = await JsonUtil.DeserializeAsync<T>(responseStream).ConfigureAwait(false);
+                return new RestResponse<T>(body, headers);
+            }
+#endif
         }
 
         await HandleInvalidStatusCode(httpResponseMessage, cancellationToken).ConfigureAwait(false);
         throw new InvalidOperationException("HandleInvalidStatusCode musi zgłosić wyjątek.");
+        }
     }
-
     /// <summary>
     /// Mapuje nie-2xx odpowiedzi na wyjątki.
     /// Guard na Content-Type.
@@ -370,11 +387,7 @@ public sealed class RestClient : IRestClient
                 await HandleForbiddenAsync(response, cancellationToken).ConfigureAwait(false);
                 return;
 
-#if NETSTANDARD2_0
-            case (System.Net.HttpStatusCode)429:
-#else
-            case System.Net.HttpStatusCode.TooManyRequests:
-#endif
+case (System.Net.HttpStatusCode)429:
                 await HandleTooManyRequestsAsync(response, cancellationToken).ConfigureAwait(false);
                 return;
 
@@ -417,14 +430,14 @@ public sealed class RestClient : IRestClient
 
         string BuildErrorMessageFromDetails(ApiErrorResponse apiErrorResponse)
         {
-            if (apiErrorResponse?.Exception.ExceptionDetailList is not { Count: > 0 })
+            if (apiErrorResponse?.Exception?.ExceptionDetailList == null || apiErrorResponse.Exception.ExceptionDetailList.Count == 0)
             {
                 return string.Empty;
             }
 
             IEnumerable<string> parts = apiErrorResponse.Exception.ExceptionDetailList.Select(detail =>
             {
-                string detailsText = (detail.Details is { Count: > 0 }) ? string.Join("; ", detail.Details) : string.Empty;
+                string detailsText = (detail.Details != null && detail.Details.Count > 0) ? string.Join("; ", detail.Details) : string.Empty;
                 return string.IsNullOrEmpty(detailsText)
                     ? $"{detail.ExceptionCode}: {detail.ExceptionDescription}"
                     : $"{detail.ExceptionCode}: {detail.ExceptionDescription} - {detailsText}";
@@ -489,7 +502,7 @@ public sealed class RestClient : IRestClient
             };
         }
 
-        static bool TryDeserializeJson<T>(string json, out T result)
+        bool TryDeserializeJson<T>(string json, out T result)
         {
             try
             {
@@ -717,11 +730,7 @@ public sealed class RestClient : IRestClient
             return null;
         }
 
-#if NETSTANDARD2_0
-        return await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
-#else
-        return await resp.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
-#endif
-    }
+    return await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
+}
 }
 }

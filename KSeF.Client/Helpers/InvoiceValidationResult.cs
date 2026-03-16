@@ -12,7 +12,7 @@ public class InvoiceValidationResult
     /// <summary>
     /// Uogólniony wynik walidacji, łączy wszystkie wyniki cząstkowe.
     /// </summary>
-    public ValidationResult ValidationResult => new(
+    public ValidationResult ValidationResult => new ValidationResult(
         IsOverallValid(),
             string.Join(", ", GetAllErrorMessages()));
     /// <summary>

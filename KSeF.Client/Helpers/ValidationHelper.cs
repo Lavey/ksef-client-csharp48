@@ -84,7 +84,7 @@ public static class ValidationHelper
             return new InvoiceValidationResult { XmlValidationResult = xmlValidationResult };
         }
 
-        XDocument document = xmlValidationResult.InvoiceXDocument!;
+        XDocument document = xmlValidationResult.InvoiceXDocument;
 
         return new InvoiceValidationResult
         {

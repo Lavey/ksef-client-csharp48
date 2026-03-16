@@ -249,15 +249,12 @@ internal static class Pkcs8Decryptor
     /// </summary>
     private static HMAC CreateHmac(string prfOid, byte[] key)
     {
-        return prfOid switch
-        {
-            HmacSha1Oid => new HMACSHA1(key),
-            HmacSha256Oid => new HMACSHA256(key),
-            HmacSha384Oid => new HMACSHA384(key),
-            HmacSha512Oid => new HMACSHA512(key),
-            _ => throw new CryptographicException(
-                $"Nieobsługiwany algorytm PRF: '{prfOid}'.")
-        };
+        if (prfOid == HmacSha1Oid) return new HMACSHA1(key);
+        if (prfOid == HmacSha256Oid) return new HMACSHA256(key);
+        if (prfOid == HmacSha384Oid) return new HMACSHA384(key);
+        if (prfOid == HmacSha512Oid) return new HMACSHA512(key);
+        throw new CryptographicException(
+                $"Nieobsługiwany algorytm PRF: '{prfOid}'.");
     }
 
     /// <summary>
@@ -308,15 +305,12 @@ internal static class Pkcs8Decryptor
     /// </summary>
     private static int GetKeyLengthForScheme(string encSchemeOid)
     {
-        return encSchemeOid switch
-        {
-            Aes128CbcOid => 16,
-            Aes192CbcOid => 24,
-            Aes256CbcOid => 32,
-            DesEde3CbcOid => 24,
-            _ => throw new CryptographicException(
-                $"Nie można określić długości klucza dla schematu: '{encSchemeOid}'.")
-        };
+        if (encSchemeOid == Aes128CbcOid) return 16;
+        if (encSchemeOid == Aes192CbcOid) return 24;
+        if (encSchemeOid == Aes256CbcOid) return 32;
+        if (encSchemeOid == DesEde3CbcOid) return 24;
+        throw new CryptographicException(
+                $"Nie można określić długości klucza dla schematu: '{encSchemeOid}'.");
     }
 }
 

@@ -46,12 +46,13 @@ public class AuthCoordinator : IAuthCoordinator
         byte[] tokenBytes = Encoding.UTF8.GetBytes(tokenWithTimestamp);
 
         // 3) Szyfrowanie RSA-OAEP SHA-256
-        byte[] tokenEncryptedBytes = encryptionMethod switch
-        {
-            EncryptionMethodEnum.Rsa => cryptographyService.EncryptKsefTokenWithRSAUsingPublicKey(tokenBytes),
-            EncryptionMethodEnum.ECDsa => cryptographyService.EncryptWithECDSAUsingPublicKey(tokenBytes),
-            _ => throw new ArgumentOutOfRangeException(nameof(encryptionMethod))
-        };
+        byte[] tokenEncryptedBytes;
+        if (encryptionMethod == EncryptionMethodEnum.Rsa)
+            tokenEncryptedBytes = cryptographyService.EncryptKsefTokenWithRSAUsingPublicKey(tokenBytes);
+        else if (encryptionMethod == EncryptionMethodEnum.ECDsa)
+            tokenEncryptedBytes = cryptographyService.EncryptWithECDSAUsingPublicKey(tokenBytes);
+        else
+            throw new ArgumentOutOfRangeException(nameof(encryptionMethod));
 
         string encryptedToken = Convert.ToBase64String(tokenEncryptedBytes);
 

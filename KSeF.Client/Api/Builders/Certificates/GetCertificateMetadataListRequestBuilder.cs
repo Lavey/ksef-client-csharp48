@@ -60,7 +60,7 @@ public interface IGetCertificateMetadataListListRequestBuilder
 /// <inheritdoc />
 internal class GetCertificateMetadataListRequestBuilderImpl : IGetCertificateMetadataListListRequestBuilder
 {
-    private readonly CertificateMetadataListRequest _request = new private readonly CertificateMetadataListRequest();
+    private readonly CertificateMetadataListRequest _request = new CertificateMetadataListRequest();
 
     /// <summary>
     /// Tworzy nową instancję buildera żądania listy certyfikatów.

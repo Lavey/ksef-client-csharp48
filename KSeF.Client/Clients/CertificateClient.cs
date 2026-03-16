@@ -74,7 +74,7 @@ public class CertificateClient : ClientBase, ICertificateClient
     {
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new(Routes.Certificates.Query);
+        StringBuilder urlBuilder = new StringBuilder(Routes.Certificates.Query);
         PaginationHelper.AppendPagination(pageOffset, pageSize, urlBuilder);
         string endpoint = urlBuilder.ToString();
 

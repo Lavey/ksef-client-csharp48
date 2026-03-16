@@ -1,6 +1,7 @@
 using KSeF.Client.Api.Services;
 using KSeF.Client.Api.Services.Internal;
 using KSeF.Client.Clients;
+using KSeF.Client.Compatibility;
 using KSeF.Client.Core.Infrastructure.Rest;
 using KSeF.Client.Core.Interfaces;
 using KSeF.Client.Core.Interfaces.Clients;
@@ -100,23 +101,7 @@ public static class ServiceCollectionExtensions
                 localizationOptions.ResourcesPath = options.ResourcesPath;
             });
 
-            if (!string.IsNullOrEmpty(options.DefaultCulture))
-            {
-                services.Configure<RequestLocalizationOptions>(localizationOptions =>
-                {
-                    localizationOptions.SetDefaultCulture(options.DefaultCulture);
-
-                    if (options.SupportedCultures != null && options.SupportedCultures.Length > 0)
-                    {
-                        localizationOptions.AddSupportedCultures(options.SupportedCultures);
-                    }
-
-                    if (options.SupportedUICultures != null && options.SupportedUICultures.Length > 0)
-                    {
-                        localizationOptions.AddSupportedUICultures(options.SupportedUICultures);
-                    }
-                });
-            }
+            // RequestLocalizationOptions (ASP.NET Core middleware) is not available in net48.
         }
 
         return services;

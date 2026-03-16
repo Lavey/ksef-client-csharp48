@@ -51,10 +51,12 @@ public static class TypeValueValidator
         {
             throw new ArgumentException($"Właściwość 'Value' nie została znaleziona w obiekcie typu `{objectType.Name}.");
         }
-        if (propertyTypeInfo.GetValue(objectToValidate) is not Enum type)
+        object typeValue = propertyTypeInfo.GetValue(objectToValidate);
+        if (!(typeValue is Enum))
         {
             throw new ArgumentException($"Właściwość 'Type' w obiekcie typu `{objectType.Name}` nie jest typu Enum.");
         }
+        Enum type = (Enum)typeValue;
 
         string valueToValidate = propertyValueInfo.GetValue(objectToValidate) as string;
 

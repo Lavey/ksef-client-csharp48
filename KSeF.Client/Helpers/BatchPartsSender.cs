@@ -1,5 +1,6 @@
 using KSeF.Client.Core.Interfaces.Rest;
 using KSeF.Client.Core.Models.Sessions.BatchSession;
+using KSeF.Client.Compatibility;
 
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,7 @@ public static class BatchPartsSender
         foreach (PackagePartSignatureInitResponseType part in parts)
         {
             TInfo fileInfo = batchPartSendingInfos?.FirstOrDefault(x =>
-                (int)x.GetType().GetProperty("OrdinalNumber")!.GetValue(x)! == part.OrdinalNumber);
+                (int)x.GetType().GetProperty("OrdinalNumber").GetValue(x) == part.OrdinalNumber);
 
             if (fileInfo == null)
             {

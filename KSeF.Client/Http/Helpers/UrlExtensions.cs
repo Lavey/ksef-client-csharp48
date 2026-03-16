@@ -18,8 +18,8 @@ internal static class UrlExtensions
             return uri;
         }
 
-        StringBuilder builder = new(uri);
-        builder.Append(uri.Contains('?') ? "&" : "?");
+        StringBuilder builder = new StringBuilder(uri);
+        builder.Append(uri.Contains("?") ? "&" : "?");
 
         bool first = true;
         foreach (KeyValuePair<string, string> pair in query)

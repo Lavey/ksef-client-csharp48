@@ -13,7 +13,7 @@ internal static class RestRequestExtensions
         HttpClient httpClient)
     {
         string url = request.Path.WithQuery(request.Query, httpClient.BaseAddress);
-        HttpRequestMessage httpRequest = new(request.Method, url);
+        HttpRequestMessage httpRequest = new HttpRequestMessage(request.Method, url);
 
         ApplyHeadersAuthAccept(request.AccessToken, request.Accept, request.Headers, httpRequest);
         return httpRequest;
@@ -25,7 +25,7 @@ internal static class RestRequestExtensions
         string defaultContentType)
     {
         string url = request.Path.WithQuery(request.Query, httpClient.BaseAddress);
-        HttpRequestMessage httpRequest = new(request.Method, url);
+        HttpRequestMessage httpRequest = new HttpRequestMessage(request.Method, url);
 
         if (request.Body != null && request.Method != HttpMethod.Get)
         {
@@ -33,7 +33,7 @@ internal static class RestRequestExtensions
                 ? JsonUtil.Serialize(request.Body)
                 : request.Body.ToString();
 
-            httpRequest.Content = new StringContent(content!, Encoding.UTF8, request.ContentType);
+            httpRequest.Content = new StringContent(content, Encoding.UTF8, request.ContentType);
         }
 
         ApplyHeadersAuthAccept(request.AccessToken, request.Accept, request.Headers, httpRequest);

@@ -39,7 +39,7 @@ internal static class CertificateCompat
 
         if (_rsaCopyMethod != null)
         {
-            return (X509Certificate2)_rsaCopyMethod.Invoke(null, new object[] { cert, rsa })!;
+            return (X509Certificate2)_rsaCopyMethod.Invoke(null, new object[] { cert, rsa });
         }
 
         throw new PlatformNotSupportedException(
@@ -62,7 +62,7 @@ internal static class CertificateCompat
 
         if (_ecdsaCopyMethod != null)
         {
-            return (X509Certificate2)_ecdsaCopyMethod.Invoke(null, new object[] { cert, ecdsa })!;
+            return (X509Certificate2)_ecdsaCopyMethod.Invoke(null, new object[] { cert, ecdsa });
         }
 
         throw new PlatformNotSupportedException(

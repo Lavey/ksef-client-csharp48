@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System;
-﻿using KSeF.Client.Core.Models.Permissions.Entity;
+using System.Linq;
+using KSeF.Client.Core.Models.Permissions.Entity;
 using KSeF.Client.Core.Models.Permissions.Identifiers;
 using KSeF.Client.Validation;
 
@@ -62,7 +63,7 @@ namespace KSeF.Client.Api.Builders.AuthorizationEntityPermissions
         /// <inheritdoc />
         private sealed class Impl : IOwnerNipStep, IOptionalStep
         {
-            private readonly EntityAuthorizationsQueryRequest _request = new private readonly EntityAuthorizationsQueryRequest();
+            private readonly EntityAuthorizationsQueryRequest _request = new EntityAuthorizationsQueryRequest();
 
             /// <inheritdoc />
             public IOptionalStep ReceivedForOwnerNip(string ownerNip)
@@ -89,7 +90,7 @@ namespace KSeF.Client.Api.Builders.AuthorizationEntityPermissions
             /// <inheritdoc />
             public IOptionalStep WithPermissionTypes(IEnumerable<InvoicePermissionType> types)
             {
-                _request.PermissionTypes = types == null ? null : [.. types];
+                _request.PermissionTypes = types.ToList() ?? new List<InvoicePermissionType>();
                 return this;
             }
 

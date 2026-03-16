@@ -24,7 +24,7 @@ public class SearchPermissionClient : ClientBase, ISearchPermissionClient
     }
     private static string WithPagination(string endpoint, int? pageOffset, int? pageSize)
     {
-        StringBuilder sb = new(endpoint);
+        StringBuilder sb = new StringBuilder(endpoint);
         PaginationHelper.AppendPagination(pageOffset, pageSize, sb);
         return sb.ToString();
     }

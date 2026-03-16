@@ -1,3 +1,4 @@
+using System.Linq;
 namespace KSeF.Client.Validation
 {
 /// <summary>

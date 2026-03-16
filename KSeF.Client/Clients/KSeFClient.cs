@@ -246,11 +246,7 @@ public class KSeFClient : IKSeFClient
 
         StringBuilder urlBuilder = new StringBuilder();
 
-#if NETSTANDARD2_0
-        urlBuilder.Append(FormattableString.Invariant($"/v2/sessions?sessionType={sessionType}"));
-#else
-        urlBuilder.Append(CultureInfo.InvariantCulture, $"/v2/sessions?sessionType={sessionType}");
-#endif
+urlBuilder.Append(FormattableString.Invariant($"/v2/sessions?sessionType={sessionType}"));
 
         // use helper
         PaginationHelper.AppendPagination(null, pageSize, urlBuilder);
@@ -430,7 +426,7 @@ public class KSeFClient : IKSeFClient
         Guard.ThrowIfNull(requestPayload);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new($"/v2/invoices/query/metadata?sortOrder={sortOrder}");
+        StringBuilder urlBuilder = new StringBuilder($"/v2/invoices/query/metadata?sortOrder={sortOrder}");
 
         PaginationHelper.AppendPagination(pageOffset, pageSize, urlBuilder);
 
@@ -514,7 +510,7 @@ public class KSeFClient : IKSeFClient
         Guard.ThrowIfNull(requestPayload);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new("/v2/permissions/query/personal/grants");
+        StringBuilder urlBuilder = new StringBuilder("/v2/permissions/query/personal/grants");
 
         PaginationHelper.AppendPagination(pageOffset, pageSize, urlBuilder);
 
@@ -538,7 +534,7 @@ public class KSeFClient : IKSeFClient
         Guard.ThrowIfNull(requestPayload);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new("/v2/permissions/query/persons/grants");
+        StringBuilder urlBuilder = new StringBuilder("/v2/permissions/query/persons/grants");
 
         PaginationHelper.AppendPagination(pageOffset, pageSize, urlBuilder);
 
@@ -563,7 +559,7 @@ public class KSeFClient : IKSeFClient
         Guard.ThrowIfNull(requestPayload);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new("/v2/permissions/query/subunits/grants");
+        StringBuilder urlBuilder = new StringBuilder("/v2/permissions/query/subunits/grants");
 
         PaginationHelper.AppendPagination(pageOffset, pageSize, urlBuilder);
 
@@ -586,7 +582,7 @@ public class KSeFClient : IKSeFClient
     {
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new("/v2/permissions/query/entities/roles");
+        StringBuilder urlBuilder = new StringBuilder("/v2/permissions/query/entities/roles");
 
         PaginationHelper.AppendPagination(pageOffset, pageSize, urlBuilder);
 
@@ -611,7 +607,7 @@ public class KSeFClient : IKSeFClient
         Guard.ThrowIfNull(requestPayload);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new("/v2/permissions/query/subordinate-entities/roles");
+        StringBuilder urlBuilder = new StringBuilder("/v2/permissions/query/subordinate-entities/roles");
 
         PaginationHelper.AppendPagination(pageOffset, pageSize, urlBuilder);
 
@@ -636,7 +632,7 @@ public class KSeFClient : IKSeFClient
         Guard.ThrowIfNull(requestPayload);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new("/v2/permissions/query/authorizations/grants");
+        StringBuilder urlBuilder = new StringBuilder("/v2/permissions/query/authorizations/grants");
 
         PaginationHelper.AppendPagination(pageOffset, pageSize, urlBuilder);
 
@@ -661,7 +657,7 @@ public class KSeFClient : IKSeFClient
         Guard.ThrowIfNull(requestPayload);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new("/v2/permissions/query/eu-entities/grants");
+        StringBuilder urlBuilder = new StringBuilder("/v2/permissions/query/eu-entities/grants");
 
         PaginationHelper.AppendPagination(pageOffset, pageSize, urlBuilder);
 
@@ -862,7 +858,7 @@ public class KSeFClient : IKSeFClient
     {
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new("/v2/certificates/query");
+        StringBuilder urlBuilder = new StringBuilder("/v2/certificates/query");
 
         PaginationHelper.AppendPagination(pageOffset, pageSize, urlBuilder);
 
@@ -901,46 +897,30 @@ public class KSeFClient : IKSeFClient
     int? pageSize = 10,
     CancellationToken cancellationToken = default)
     {
-        StringBuilder urlBuilder = new("/v2/tokens?");
+        StringBuilder urlBuilder = new StringBuilder("/v2/tokens?");
 
         if (statuses != null && statuses.Count > 0)
         {
             foreach (AuthenticationKsefTokenStatus s in statuses)
             {
-#if NETSTANDARD2_0
-                urlBuilder.Append(FormattableString.Invariant($"status={Uri.EscapeDataString(s.ToString())}&"));
-#else
-                urlBuilder.Append(CultureInfo.InvariantCulture, $"status={Uri.EscapeDataString(s.ToString())}&");
-#endif
-            }
+    urlBuilder.Append(FormattableString.Invariant($"status={Uri.EscapeDataString(s.ToString())}&"));
+}
         }
 
         if (!string.IsNullOrWhiteSpace(authorIdentifier))
         {
-#if NETSTANDARD2_0
-            urlBuilder.Append(FormattableString.Invariant($"authorIdentifier={Uri.EscapeDataString(authorIdentifier)}&"));
-#else
-            urlBuilder.Append(CultureInfo.InvariantCulture, $"authorIdentifier={Uri.EscapeDataString(authorIdentifier)}&");
-#endif
-        }
+    urlBuilder.Append(FormattableString.Invariant($"authorIdentifier={Uri.EscapeDataString(authorIdentifier)}&"));
+}
 
         if (authorIdentifierType.HasValue)
         {
-#if NETSTANDARD2_0
-            urlBuilder.Append(FormattableString.Invariant($"authorIdentifierType={authorIdentifierType.Value}&"));
-#else
-            urlBuilder.Append(CultureInfo.InvariantCulture, $"authorIdentifierType={authorIdentifierType.Value}&");
-#endif
-        }
+    urlBuilder.Append(FormattableString.Invariant($"authorIdentifierType={authorIdentifierType.Value}&"));
+}
 
         if (!string.IsNullOrWhiteSpace(description))
         {
-#if NETSTANDARD2_0
-            urlBuilder.Append(FormattableString.Invariant($"description={Uri.EscapeDataString(description)}&"));
-#else
-            urlBuilder.Append(CultureInfo.InvariantCulture, $"description={Uri.EscapeDataString(description)}&");
-#endif
-        }
+    urlBuilder.Append(FormattableString.Invariant($"description={Uri.EscapeDataString(description)}&"));
+}
 
         PaginationHelper.AppendPagination(null, pageSize, urlBuilder);
 
@@ -993,7 +973,7 @@ public class KSeFClient : IKSeFClient
      int? pageSize = null,
      CancellationToken cancellationToken = default)
     {
-        StringBuilder urlBuilder = new("/v2/peppol/query");
+        StringBuilder urlBuilder = new StringBuilder("/v2/peppol/query");
 
         PaginationHelper.AppendPagination(pageOffset, pageSize, urlBuilder);
 
@@ -1026,7 +1006,7 @@ public class KSeFClient : IKSeFClient
         Guard.ThrowIfNull(requestPayload);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new("/v2/invoices/exports");
+        StringBuilder urlBuilder = new StringBuilder("/v2/invoices/exports");
 
         Dictionary<string, string> headers = null;
 
@@ -1113,7 +1093,7 @@ public class KSeFClient : IKSeFClient
         Guard.ThrowIfNull(requestPayload);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new("/v2/" + Routes.Permissions.Query.Entities);
+        StringBuilder urlBuilder = new StringBuilder("/v2/" + Routes.Permissions.Query.Entities);
 
         PaginationHelper.AppendPagination(pageOffset, pageSize, urlBuilder);
 

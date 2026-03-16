@@ -1,5 +1,4 @@
 using System;
-﻿using System;
 
 namespace KSeF.Client.Core.Models.TestData
 {

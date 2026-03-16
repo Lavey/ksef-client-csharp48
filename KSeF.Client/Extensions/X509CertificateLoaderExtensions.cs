@@ -1,12 +1,13 @@
 using System.IO;
 using System.Linq;
 using System;
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 #if NET5_0_OR_GREATER
 using System.Security.Cryptography.Pkcs;
 #endif
 using System.Security.Cryptography.X509Certificates;
+using KSeF.Client.Compatibility;
 
 namespace KSeF.Client.Extensions
 {
@@ -142,7 +143,7 @@ namespace KSeF.Client.Extensions
                     rsa.ImportFromPem(privateKeyPem);
                 }
 
-                return publicCert.CopyWithPrivateKey(rsa);
+                return RSACertificateExtensions.CopyWithPrivateKey(publicCert, rsa);
                 }
             }
             else if (oid == EcOid)
@@ -170,7 +171,7 @@ namespace KSeF.Client.Extensions
                 }
 #endif
 
-                return publicCert.CopyWithPrivateKey(ecdsa);
+                return ECDsaCertificateExtensions.CopyWithPrivateKey(publicCert, ecdsa);
                 }
             }
 

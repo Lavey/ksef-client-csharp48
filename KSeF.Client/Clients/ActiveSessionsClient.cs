@@ -27,7 +27,7 @@ public class ActiveSessionsClient : ClientBase, IActiveSessionsClient
     {
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new(Routes.ActiveSessions.Session);
+        StringBuilder urlBuilder = new StringBuilder(Routes.ActiveSessions.Session);
 
         PaginationHelper.AppendPagination(null, pageSize, urlBuilder);
 

@@ -27,18 +27,14 @@ public class SessionStatusClient : ClientBase, ISessionStatusClient
     {
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new($"{Routes.Sessions.Root}?sessionType={sessionType}");
+        StringBuilder urlBuilder = new StringBuilder($"{Routes.Sessions.Root}?sessionType={sessionType}");
 
         if (pageSize.HasValue)
         {
-#if NETSTANDARD2_0
-            urlBuilder.Append(FormattableString.Invariant($"&pageSize={pageSize.Value}"));
-#else
-            urlBuilder.Append(CultureInfo.InvariantCulture,$"&pageSize={pageSize.Value}");
-#endif
-        }
+    urlBuilder.Append(FormattableString.Invariant($"&pageSize={pageSize.Value}"));
+}
 
-        sessionsFilter?.AppendAsQuery(urlBuilder);
+sessionsFilter?.AppendAsQuery(urlBuilder);
 
         string endpoint = urlBuilder.ToString();
 
@@ -68,15 +64,11 @@ public class SessionStatusClient : ClientBase, ISessionStatusClient
         Guard.ThrowIfNullOrWhiteSpace(sessionReferenceNumber);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new(Routes.Sessions.Invoices(Uri.EscapeDataString(sessionReferenceNumber)));
+        StringBuilder urlBuilder = new StringBuilder(Routes.Sessions.Invoices(Uri.EscapeDataString(sessionReferenceNumber)));
 
         if (pageSize.HasValue)
         {
-#if NETSTANDARD2_0
             urlBuilder.Append(FormattableString.Invariant($"?pageSize={pageSize.Value}"));
-#else
-            urlBuilder.Append(CultureInfo.InvariantCulture,$"?pageSize={pageSize.Value}");
-#endif
         }
 
         string endpoint = urlBuilder.ToString();
@@ -108,15 +100,11 @@ public class SessionStatusClient : ClientBase, ISessionStatusClient
         Guard.ThrowIfNullOrWhiteSpace(sessionReferenceNumber);
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new(Routes.Sessions.FailedInvoices(Uri.EscapeDataString(sessionReferenceNumber)));
+        StringBuilder urlBuilder = new StringBuilder(Routes.Sessions.FailedInvoices(Uri.EscapeDataString(sessionReferenceNumber)));
 
         if (pageSize.HasValue)
         {
-#if NETSTANDARD2_0
             urlBuilder.Append(FormattableString.Invariant($"?pageSize={pageSize.Value}"));
-#else
-            urlBuilder.Append(CultureInfo.InvariantCulture,$"?pageSize={pageSize.Value}");
-#endif
         }
 
         string endpoint = urlBuilder.ToString();

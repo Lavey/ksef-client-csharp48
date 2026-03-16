@@ -248,14 +248,15 @@ internal sealed class EcdhCompat : IDisposable
         {
             // Fallback: precyzyjne dopasowanie nazw CNG (zamiast fragile Contains)
             string friendly = parameters.Curve.Oid.FriendlyName;
-            curveOid = friendly switch
-            {
-                "nistP256" or "ECDSA_P256" or "ECDH_P256" => NistP256Oid,
-                "nistP384" or "ECDSA_P384" or "ECDH_P384" => "1.3.132.0.34",
-                "nistP521" or "ECDSA_P521" or "ECDH_P521" => "1.3.132.0.35",
-                _ => throw new CryptographicException(
-                    $"Nie można określić OID dla krzywej EC ECDH o nazwie '{friendly}'.")
-            };
+            if (friendly == "nistP256" || friendly == "ECDSA_P256" || friendly == "ECDH_P256")
+                curveOid = NistP256Oid;
+            else if (friendly == "nistP384" || friendly == "ECDSA_P384" || friendly == "ECDH_P384")
+                curveOid = "1.3.132.0.34";
+            else if (friendly == "nistP521" || friendly == "ECDSA_P521" || friendly == "ECDH_P521")
+                curveOid = "1.3.132.0.35";
+            else
+                throw new CryptographicException(
+                    $"Nie można określić OID dla krzywej EC ECDH o nazwie '{friendly}'.");
         }
         else
         {

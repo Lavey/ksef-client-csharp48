@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 
 namespace KSeF.Client.Http.Helpers
@@ -17,12 +18,12 @@ public static class PaginationHelper
     {
         if (pageSize.HasValue && pageSize > 0)
         {
-            urlBuilder.Append(urlBuilder.ToString().Contains('?') ? '&' : '?');
+            urlBuilder.Append(urlBuilder.ToString().Contains("?") ? "&" : "?");
             urlBuilder.Append("pageSize=").Append(Uri.EscapeDataString(pageSize.ToString()));
         }
         if (pageOffset.HasValue && pageOffset > 0)
         {
-            urlBuilder.Append(urlBuilder.ToString().Contains('?') ? '&' : '?');
+            urlBuilder.Append(urlBuilder.ToString().Contains("?") ? "&" : "?");
             urlBuilder.Append("pageOffset=").Append(Uri.EscapeDataString(pageOffset.ToString()));
         }
     }

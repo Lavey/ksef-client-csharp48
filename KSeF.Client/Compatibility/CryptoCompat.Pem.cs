@@ -13,7 +13,7 @@ namespace KSeF.Client.Compatibility
 /// </summary>
 internal static class PemHelper
 {
-    private static readonly Regex PemBlockRegex = new(
+    private static readonly Regex PemBlockRegex = new Regex(
         @"-----BEGIN\s+(?<label>[^-]+)-----\s*(?<data>[A-Za-z0-9+/=\s]+?)\s*-----END\s+\k<label>-----",
         RegexOptions.Compiled | RegexOptions.Singleline);
 

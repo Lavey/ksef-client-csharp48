@@ -26,7 +26,7 @@ namespace KSeF.Client.ClientFactory
     /// </remarks>
     public static class KsefEnvironmentConfig
     {
-        public static readonly Dictionary<Environment, string> BaseUrls = new()
+        public static readonly Dictionary<Environment, string> BaseUrls = new Dictionary<Environment, string>()
         {
             { Environment.Test, "https://api-test.ksef.mf.gov.pl" },
             { Environment.Demo, "https://api-demo.ksef.mf.gov.pl" },

@@ -1,7 +1,6 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using System;
-﻿#nullable enable
 using KSeF.Client.Api.Services;
 using KSeF.Client.Core.Interfaces.Clients;
 using KSeF.Client.Core.Interfaces.Services;
@@ -48,14 +47,20 @@ namespace KSeF.Client.ClientFactory
     /// jest tworzona tylko raz. Serwis umożliwia pobieranie certyfikatów publicznych
     /// oraz wykonywanie operacji kryptograficznych wymaganych przez KSeF.
     /// </remarks>
-    public class KSeFFactoryCryptographyServices(IHttpClientFactory _factory) : IKSeFFactoryCryptographyServices
+    public class KSeFFactoryCryptographyServices : IKSeFFactoryCryptographyServices
     {
+        private readonly IHttpClientFactory _factory;
+
+        public KSeFFactoryCryptographyServices(IHttpClientFactory factory)
+        {
+            _factory = factory;
+        }
         private Task<ICryptographyService> demoCryptographyService;
-        private readonly object demoCryptographyServiceLock = new();
+        private readonly object demoCryptographyServiceLock = new object();
         private Task<ICryptographyService> prodCryptographyService;
-        private readonly object prodCryptographyServiceLock = new();
+        private readonly object prodCryptographyServiceLock = new object();
         private Task<ICryptographyService> testCryptographyService;
-        private readonly object testCryptographyServiceLock = new();
+        private readonly object testCryptographyServiceLock = new object();
 
         /// <summary>
         /// Pobiera lub tworzy instancję <see cref="ICryptographyService"/> dla danego środowiska.

@@ -30,7 +30,7 @@ public class PeppolClient : ClientBase, IPeppolClient
     {
         Guard.ThrowIfNullOrWhiteSpace(accessToken);
 
-        StringBuilder urlBuilder = new(Routes.Peppol.Query);
+        StringBuilder urlBuilder = new StringBuilder(Routes.Peppol.Query);
 
         PaginationHelper.AppendPagination(pageOffset, pageSize, urlBuilder);
 

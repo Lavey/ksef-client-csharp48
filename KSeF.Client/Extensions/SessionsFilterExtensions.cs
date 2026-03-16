@@ -1,4 +1,5 @@
 using KSeF.Client.Core.Models.Sessions;
+using KSeF.Client.Compatibility;
 using System.Globalization;
 using System.Text;
 
@@ -33,11 +34,7 @@ public static class SessionsFilterExtensions
         {
             if (!string.IsNullOrEmpty(value))
             {
-#if NETSTANDARD2_0
-                builder.Append(FormattableString.Invariant($"&{name}={Uri.EscapeDataString(value)}"));
-#else
-                builder.Append(CultureInfo.InvariantCulture,$"&{name}={Uri.EscapeDataString(value)}");
-#endif
+builder.Append(FormattableString.Invariant($"&{name}={Uri.EscapeDataString(value)}"));
             }
         }
 

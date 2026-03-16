@@ -63,8 +63,12 @@ public static class JsonUtil
     {
         try
         {
-            return JsonSerializer.Deserialize<T>(json, _settings)
-                   ?? throw new InvalidOperationException($"[Deserialize] Zdeserializowana wartość jest pusta (null) dla typu {typeof(T).Name}. JSON: {Shorten(json)}");
+            T deserialized = JsonSerializer.Deserialize<T>(json, _settings);
+            if (deserialized == null)
+            {
+                throw new InvalidOperationException($"[Deserialize] Zdeserializowana wartość jest pusta (null) dla typu {typeof(T).Name}. JSON: {Shorten(json)}");
+            }
+            return deserialized;
         }
         catch (Exception ex)
         {
@@ -104,13 +108,16 @@ public static class JsonUtil
                 {
                     input.Seek(0, SeekOrigin.Begin);
 #if NETSTANDARD2_0
-                    using (StreamReader reader = new(input, Encoding.UTF8, true, 1024, true))
+                    using (StreamReader reader = new StreamReader(input, Encoding.UTF8, true, 1024, true))
                     {
-#else
-                    using StreamReader reader = new(input, leaveOpen: true);
-#endif
-                    jsonFragment = await reader.ReadToEndAsync().ConfigureAwait(false);
+                        jsonFragment = await reader.ReadToEndAsync().ConfigureAwait(false);
                     }
+#else
+                    using (StreamReader reader = new StreamReader(input, Encoding.UTF8, true, 1024, true))
+                    {
+                        jsonFragment = await reader.ReadToEndAsync().ConfigureAwait(false);
+                    }
+#endif
                 }
             }
             catch { /* nie psuj głównego wyjątku */ }
@@ -137,7 +144,7 @@ public static class JsonUtil
 #if NETSTANDARD2_0
         return string.Concat(input.Substring(0, maxLen), "...");
 #else
-        return string.Concat(input.AsSpan(0, maxLen), "...");
+        return string.Concat(input.Substring(0, maxLen), "...");
 #endif
     }
 }
